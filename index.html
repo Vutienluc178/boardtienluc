@@ -361,6 +361,186 @@ html, body {
 .si.active { background: rgba(59,130,246,.26); color: #60a5fa; border-color: rgba(59,130,246,.52); }
 
 /* ══════════════════════════════════════════════════════
+   PEN TYPES FLYOUT PANEL
+══════════════════════════════════════════════════════ */
+#pen-types-panel {
+    position: fixed;
+    left: 80px; top: 50%; transform: translateY(-50%);
+    background: rgba(7,11,22,.97);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 16px;
+    padding: 14px 12px;
+    width: 310px;
+    display: none; z-index: 160;
+    box-shadow: 0 20px 56px rgba(0,0,0,.6);
+}
+#pen-types-panel.open { display: block; }
+.pt-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+    margin-top: 8px;
+}
+.pt-card {
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 10px;
+    background: rgba(255,255,255,.04);
+    cursor: pointer;
+    padding: 8px 8px 6px;
+    transition: all .14s;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 5px;
+}
+.pt-card:hover {
+    background: rgba(99,102,241,.18);
+    border-color: rgba(99,102,241,.38);
+    transform: scale(1.03);
+}
+.pt-card.active {
+    background: rgba(99,102,241,.26);
+    border-color: rgba(99,102,241,.56);
+}
+.pt-card svg { width: 100%; display: block; }
+.pt-card-name {
+    font-size: 11px; font-weight: 700;
+    color: #94a3b8; text-align: center;
+    line-height: 1.25;
+}
+.pt-card.active .pt-card-name { color: #a5b4fc; }
+/* Pen type indicator badge on pen button */
+#pen-type-badge {
+    position: absolute; bottom: 1px; right: 1px;
+    background: rgba(99,102,241,.85);
+    color: #fff; font-size: 7px; font-weight: 800;
+    border-radius: 3px; padding: 0 2.5px;
+    line-height: 12px; letter-spacing: .02em;
+    pointer-events: none; text-transform: uppercase;
+}
+
+/* ══════════════════════════════════════════════════════
+   3D MODELS FLYOUT PANEL
+══════════════════════════════════════════════════════ */
+#models3d-panel {
+    position: fixed;
+    left: 80px; top: 50%; transform: translateY(-50%);
+    background: rgba(7,11,22,.97);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 16px;
+    padding: 14px 12px;
+    width: 330px;
+    display: none; z-index: 150;
+    box-shadow: 0 20px 56px rgba(0,0,0,.6);
+    max-height: 92vh; overflow-y: auto;
+    scrollbar-width: none;
+}
+#models3d-panel::-webkit-scrollbar { display: none; }
+#models3d-panel.open { display: block; }
+.m3d-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+}
+.m3d-card {
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 10px;
+    background: rgba(255,255,255,.04);
+    cursor: pointer;
+    padding: 6px 6px 5px;
+    text-align: center;
+    transition: all .14s;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: space-between;
+    gap: 3px;
+    height: 90px;
+}
+.m3d-card:hover {
+    background: rgba(59,130,246,.18);
+    border-color: rgba(59,130,246,.4);
+    transform: scale(1.04);
+}
+.m3d-card svg { flex: 1; width: 100%; min-height: 0; overflow: visible; }
+.m3d-card-name {
+    font-size: 10px; font-weight: 700;
+    color: #94a3b8; letter-spacing: .02em;
+    flex-shrink: 0; line-height: 1.3;
+}
+
+/* ══════════════════════════════════════════════════════
+   PLACED 3D MODEL OVERLAYS
+══════════════════════════════════════════════════════ */
+.model3d-ov {
+    position: absolute;
+    z-index: 15;
+    user-select: none;
+    touch-action: none;
+    /* body transparent to drawing by default */
+}
+/* When container has class 'active-models', overlays become interactive */
+#models3d-container.active-models .model3d-ov { pointer-events: auto; }
+#models3d-container:not(.active-models) .model3d-ov { pointer-events: none; }
+.model3d-ov svg {
+    width: 100%; height: 100%;
+    display: block;
+    filter: drop-shadow(0 6px 22px rgba(0,0,0,.32));
+}
+.model3d-ov .m3d-del {
+    position: absolute; top: -11px; right: -11px;
+    width: 23px; height: 23px;
+    border-radius: 50%;
+    background: #ef4444; color: #fff;
+    font-size: 14px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; opacity: 0; transition: opacity .15s;
+    z-index: 6; border: 2px solid rgba(255,255,255,.8);
+    line-height: 1;
+    box-shadow: 0 2px 8px rgba(0,0,0,.4);
+}
+.model3d-ov:hover .m3d-del { opacity: 1; }
+.model3d-ov .m3d-rz {
+    position: absolute; bottom: -8px; right: -8px;
+    width: 20px; height: 20px;
+    background: rgba(59,130,246,.8);
+    border-radius: 5px;
+    cursor: se-resize; z-index: 6;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity .15s;
+    border: 1.5px solid rgba(255,255,255,.5);
+    box-shadow: 0 2px 8px rgba(0,0,0,.35);
+    color: #fff; font-size: 12px;
+}
+.model3d-ov:hover .m3d-rz { opacity: 1; }
+.model3d-ov .m3d-drag {
+    position: absolute; top: -10px; left: 50%;
+    transform: translateX(-50%);
+    width: 40px; height: 14px;
+    background: rgba(255,255,255,.18);
+    border-radius: 8px;
+    cursor: move; z-index: 6;
+    opacity: 0; transition: opacity .15s;
+    display: flex; align-items: center; justify-content: center;
+}
+.model3d-ov:hover .m3d-drag { opacity: 1; }
+.model3d-ov .m3d-drag::after {
+    content: '⠿'; color: rgba(255,255,255,.7); font-size: 9px;
+}
+/* When in model-select mode, show hint border */
+#models3d-container.active-models .model3d-ov {
+    outline: 1.5px dashed rgba(59,130,246,.35);
+    border-radius: 4px;
+}
+/* model-select tool button special styling */
+#btn-model-select.active {
+    background: rgba(34,197,94,.22);
+    color: #4ade80;
+    border-color: rgba(34,197,94,.4);
+}
+
+/* ══════════════════════════════════════════════════════
    BOARD CONTAINER
 ══════════════════════════════════════════════════════ */
 #board {
@@ -398,20 +578,122 @@ html, body {
     transition: background .04s;
 }
 
+/* Transparent PNG download button */
+.tb-full.dl-transparent {
+    background: rgba(6,182,212,.14);
+    color: #22d3ee;
+    border-color: rgba(6,182,212,.32);
+    margin-top: 3px;
+}
+.tb-full.dl-transparent:hover {
+    background: rgba(6,182,212,.24);
+    color: #67e8f9;
+    border-color: rgba(6,182,212,.5);
+}
+
+/* Download toast */
+#dl-toast {
+    position: fixed;
+    bottom: 20px; left: 50%; transform: translateX(-50%) translateY(12px);
+    background: rgba(6,182,212,.95);
+    color: #fff;
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 12px; font-weight: 700;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .18s, transform .18s;
+    z-index: 999;
+    white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(6,182,212,.35);
+}
+#dl-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Polygon fill vertex count badge */
+#poly-pt-badge {
+    position: absolute; top: 1px; right: 3px;
+    background: rgba(251,146,60,.88);
+    color: #fff; font-size: 7px; font-weight: 800;
+    border-radius: 3px; padding: 0 3px; line-height: 12px;
+    pointer-events: none;
+}
+/* Polygon fill active button style */
+.tb-full.poly-active {
+    background: rgba(251,146,60,.18);
+    color: #fb923c;
+    border-color: rgba(251,146,60,.38);
+}
+
+/* Snap-to-line toast */
+#snap-toast {
+    position: fixed;
+    top: 18px; left: 50%; transform: translateX(-50%) translateY(-8px);
+    background: rgba(16,185,129,.93);
+    color: #fff;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: .02em;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .18s, transform .18s;
+    z-index: 999;
+    white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(16,185,129,.35);
+}
+#snap-toast.show {
+    opacity: 1; transform: translateX(-50%) translateY(0);
+}
+/* Snap toggle button green style */
+.tb-full.snap-on {
+    background: rgba(16,185,129,.18);
+    color: #34d399;
+    border-color: rgba(16,185,129,.38);
+}
+
+/* Upload hint toast */
+#upload-toast {
+    position: fixed;
+    bottom: 20px; left: 50%; transform: translateX(-50%) translateY(12px);
+    background: rgba(15,23,42,.95);
+    color: #e2e8f0;
+    font-size: 12.5px; font-weight: 600;
+    padding: 9px 18px;
+    border-radius: 99px;
+    border: 1px solid rgba(255,255,255,.09);
+    box-shadow: 0 8px 32px rgba(0,0,0,.4);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .22s, transform .22s;
+    z-index: 999;
+    white-space: nowrap;
+}
+#upload-toast.show {
+    opacity: 1; transform: translateX(-50%) translateY(0);
+}
+
 /* Paste overlay */
 #paste-ov {
     position: absolute; z-index: 40;
     border: 2px dashed #3b82f6;
     background: rgba(255,255,255,.12);
     touch-action: none; cursor: move;
+    overflow: visible;          /* resize handle must be clickable outside bounds */
+    user-select: none;
+    -webkit-user-select: none;
 }
 #paste-ov.hidden { display: none; }
 #rz-handle {
-    position: absolute; bottom: -12px; right: -12px;
-    width: 24px; height: 24px;
+    position: absolute; bottom: -15px; right: -15px;
+    width: 30px; height: 30px;
     background: #3b82f6; border-radius: 50%;
-    cursor: se-resize; border: 2px solid #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,.3);
+    cursor: se-resize; border: 3px solid #fff;
+    box-shadow: 0 2px 12px rgba(59,130,246,.6);
+    z-index: 50;
+    /* three grip dots */
+    background-image: radial-gradient(circle, rgba(255,255,255,.7) 2px, transparent 2px);
+    background-size: 9px 9px;
+    background-position: center;
 }
 .pa-btns { position: absolute; top: -44px; right: 0; display: flex; gap: 7px; }
 .pa-btn {
@@ -449,13 +731,22 @@ html, body {
 
     <!-- ── VẼ TỰ DO ── -->
     <div class="s-grid">
-        <button class="tb active" data-tool="pen"       data-tip="Bút vẽ (P)"><i data-lucide="pencil"></i></button>
+        <button class="tb active" data-tool="pen" data-tip="Bút vẽ (P)">
+            <i data-lucide="pencil"></i>
+            <span id="pen-type-badge">bi</span>
+        </button>
         <button class="tb acc-yellow" data-tool="highlight" data-tip="Dạ quang (H)"><i data-lucide="highlighter"></i></button>
         <button class="tb" data-tool="eraser"    data-tip="Tẩy (E)"><i data-lucide="eraser"></i></button>
         <button class="tb acc-red" data-tool="laser"     data-tip="Con trỏ laser"><i data-lucide="zap"></i></button>
         <button class="tb" data-tool="text"      data-tip="Chèn chữ (T)"><i data-lucide="type"></i></button>
         <button class="tb acc-violet" id="btn-stamp" data-tool="stamp" data-tip="Đóng dấu ký hiệu"><i data-lucide="stamp"></i></button>
     </div>
+    <button class="tb-full" id="btn-pen-types" data-tip="Chọn loại bút viết" style="margin-top:3px">
+        <i data-lucide="pen-tool"></i> Loại bút
+    </button>
+    <button class="tb-full snap-on" id="btn-snap-line" data-tip="Tự nhận dạng đoạn thẳng (bật/tắt)" style="margin-top:3px">
+        <i data-lucide="ruler"></i> Nhận dạng
+    </button>
 
     <div class="s-div"></div>
 
@@ -482,12 +773,21 @@ html, body {
         <button class="tb" data-tool="seg-tick"     data-tip="Dấu tích đoạn thẳng"><i data-lucide="align-center"></i></button>
     </div>
 
+    <!-- Polygon fill button -->
+    <button class="tb-full" id="btn-poly-fill" data-tip="Tô màu đa giác – chấm các đỉnh, click điểm đầu hoặc double-click để đóng (F)" style="margin-bottom:3px">
+        <i data-lucide="pentagon"></i> Đa giác
+        <span id="poly-pt-badge" style="display:none">0</span>
+    </button>
+
     <!-- Shapes button -->
     <button class="tb-full" id="btn-shapes" data-tip="Thư viện hình học">
         <i data-lucide="shapes"></i> Hình học
     </button>
-    <button class="tb-full active" id="btn-fill3d" data-tip="Tô màu mô hình không gian" style="margin-top:3px">
-        <i data-lucide="palette"></i> Tô màu 3D
+    <button class="tb-full" id="btn-models3d" data-tip="Mô hình 3D màu sắc kéo thả" style="margin-top:3px">
+        <i data-lucide="box"></i> Mô hình 3D
+    </button>
+    <button class="tb" id="btn-model-select" data-tip="Di chuyển mô hình 3D (M)" style="width:100%;height:26px;border-radius:7px;margin-top:3px;font-size:10px;font-weight:600;gap:4px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.04);">
+        <i data-lucide="move"></i> <span style="font-size:9px">Di chuyển</span>
     </button>
 
     <div class="s-div"></div>
@@ -529,8 +829,16 @@ html, body {
         <button class="tb" id="btn-undo"     data-tip="Hoàn tác (Ctrl+Z)" disabled><i data-lucide="undo"></i></button>
         <button class="tb" id="btn-redo"     data-tip="Làm lại (Ctrl+Y)"  disabled><i data-lucide="redo"></i></button>
         <button class="tb" id="btn-clear"    data-tip="Xóa bảng"><i data-lucide="trash-2"></i></button>
-        <button class="tb" id="btn-download" data-tip="Lưu ảnh PNG"><i data-lucide="download"></i></button>
+        <button class="tb" id="btn-download" data-tip="Lưu PNG (nền trắng/lưới)"><i data-lucide="download"></i></button>
+        <button class="tb" id="btn-upload-img" data-tip="Chèn ảnh từ máy (PNG/JPG)" style="grid-column:span 2;width:100%;height:28px;border-radius:7px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.04);font-size:10px;font-weight:600;gap:5px;color:rgba(148,163,184,.72);">
+            <i data-lucide="image-plus"></i> <span>Chèn ảnh</span>
+        </button>
     </div>
+    <input type="file" id="img-file-input" accept="image/*" style="display:none" />
+    <button class="tb-full dl-transparent" id="btn-download-transparent"
+            data-tip="Tải PNG trong suốt – chỉ nét vẽ, không nền, chất lượng cao">
+        <i data-lucide="image-down"></i> PNG trong suốt
+    </button>
     <button class="tb-full" id="btn-spotlight" data-tip="Spotlight (làm tối xung quanh)">
         <i data-lucide="flashlight"></i> Spotlight
     </button>
@@ -540,6 +848,25 @@ html, body {
     <button class="tb-full" id="btn-fullscreen" data-tip="Toàn màn hình (F11)" style="margin-top:3px">
         <i data-lucide="maximize"></i> Toàn màn
     </button>
+
+    <div class="s-div"></div>
+
+    <a href="https://svgplay.vercel.app/" target="_blank" rel="noopener"
+       style="
+           display:flex; align-items:center; justify-content:center; gap:5px;
+           width:100%; height:30px; border-radius:8px; margin-top:2px;
+           background:linear-gradient(135deg,rgba(99,102,241,.22),rgba(168,85,247,.18));
+           border:1px solid rgba(139,92,246,.35);
+           color:#a78bfa; font-size:10px; font-weight:700;
+           text-decoration:none; letter-spacing:.03em;
+           transition:background .15s, border-color .15s, color .15s;
+           flex-shrink:0;
+       "
+       onmouseover="this.style.background='linear-gradient(135deg,rgba(99,102,241,.38),rgba(168,85,247,.32))';this.style.borderColor='rgba(167,139,250,.6)';this.style.color='#c4b5fd'"
+       onmouseout="this.style.background='linear-gradient(135deg,rgba(99,102,241,.22),rgba(168,85,247,.18))';this.style.borderColor='rgba(139,92,246,.35)';this.style.color='#a78bfa'"
+       data-tip="Mở SVG Play →">
+        <i data-lucide="sparkles" style="width:12px;height:12px"></i> SVG Play
+    </a>
 
 </aside>
 
@@ -591,6 +918,68 @@ html, body {
     </div>
 </div>
 
+<!-- ═══════════════════════  PEN TYPES PANEL  ═══════════════════════ -->
+<div id="pen-types-panel">
+    <div class="sp-head">🖊 Chọn Loại Bút Viết</div>
+    <div class="pt-grid" id="pt-grid">
+        <div class="pt-card active" data-pen="ballpoint">
+            <svg viewBox="0 0 80 36" class="pt-preview">
+                <path d="M8 28 Q40 8 72 28" stroke="#6366f1" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+            </svg>
+            <div class="pt-card-name">Bút bi</div>
+        </div>
+        <div class="pt-card" data-pen="pencil">
+            <svg viewBox="0 0 80 36" class="pt-preview">
+                <path d="M8 28 Q40 8 72 28" stroke="#aaa" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-dasharray="1,1.5"/>
+                <path d="M9 29 Q40 9.5 71 29" stroke="#888" stroke-width="0.8" fill="none" stroke-linecap="round" stroke-dasharray="1,2.5"/>
+            </svg>
+            <div class="pt-card-name">Bút chì</div>
+        </div>
+        <div class="pt-card" data-pen="fountain">
+            <svg viewBox="0 0 80 36" class="pt-preview">
+                <path d="M8 28 Q25 22 40 18 Q55 14 72 28" stroke="#6366f1" stroke-width="3.8" fill="none" stroke-linecap="round" opacity="0.85"/>
+                <path d="M8 28 Q25 22 40 18" stroke="#a5b4fc" stroke-width="1" fill="none" stroke-linecap="round"/>
+            </svg>
+            <div class="pt-card-name">Bút mực</div>
+        </div>
+        <div class="pt-card" data-pen="calligraphy">
+            <svg viewBox="0 0 80 36" class="pt-preview">
+                <path d="M8 30 C18 30 22 8 40 8 C58 8 62 30 72 30" stroke="#a78bfa" stroke-width="5.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+                <path d="M40 8 C58 8 62 30 72 30" stroke="#a78bfa" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.9"/>
+                <path d="M8 30 C18 30 22 8 40 8" stroke="#a78bfa" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.9"/>
+            </svg>
+            <div class="pt-card-name">Thư pháp</div>
+        </div>
+        <div class="pt-card" data-pen="brush">
+            <svg viewBox="0 0 80 36" class="pt-preview">
+                <path d="M8 28 Q40 8 72 28" stroke="#818cf8" stroke-width="9" fill="none" stroke-linecap="round" opacity="0.18"/>
+                <path d="M8 28 Q40 8 72 28" stroke="#818cf8" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.7"/>
+            </svg>
+            <div class="pt-card-name">Bút lông</div>
+        </div>
+        <div class="pt-card" data-pen="marker">
+            <svg viewBox="0 0 80 36" class="pt-preview">
+                <path d="M8 27 Q40 10 72 27" stroke="#6366f1" stroke-width="7" fill="none" stroke-linecap="square" opacity="0.88"/>
+            </svg>
+            <div class="pt-card-name">Bút dạ</div>
+        </div>
+    </div>
+    <div style="margin-top:8px;font-size:9px;color:rgba(100,116,139,.5);text-align:center">
+        Chọn loại bút · Nhấn <b style="color:#818cf8">P</b> để bật bút vẽ
+    </div>
+</div>
+
+<!-- ═══════════════════════  3D MODELS PANEL  ═══════════════════════ -->
+<div id="models3d-panel">
+    <div class="sp-head">🧊 Mô hình Không gian 3D — Kéo thả, co dãn tự do</div>
+    <div class="m3d-grid" id="m3d-grid">
+        <!-- populated by JS -->
+    </div>
+    <div style="margin-top:10px;font-size:9.5px;color:rgba(100,116,139,.6);text-align:center;line-height:1.5">
+        Click để đặt mô hình lên bảng · Dùng nút <b style="color:#4ade80">Di chuyển</b> để kéo thả &amp; thay đổi kích thước
+    </div>
+</div>
+
 <!-- ═══════════════════════  BOARD  ═══════════════════════ -->
 <div id="board" class="bg-grid">
 
@@ -623,6 +1012,18 @@ html, body {
         <span class="oxy-lbl" style="top:50%;left:50%;margin-top:7px;margin-left:9px">O</span>
     </div>
 
+    <!-- Snap-to-line toast -->
+    <div id="snap-toast">⟀ Nhận dạng đoạn thẳng</div>
+
+    <!-- Download transparent toast -->
+    <div id="dl-toast">⬇ Đã tải PNG trong suốt!</div>
+
+    <!-- Upload hint toast -->
+    <div id="upload-toast">📎 Kéo thả ảnh vào bảng, hoặc dán (Ctrl+V)</div>
+
+    <!-- 3D Model overlays container -->
+    <div id="models3d-container" style="position:absolute;inset:0;z-index:15;pointer-events:none;"></div>
+
     <!-- Angle arc helper overlay (3-point tool) -->
     <canvas id="tmp-canvas" style="position:absolute;inset:0;z-index:11;pointer-events:none;"></canvas>
 
@@ -654,7 +1055,9 @@ const state = {
     stampChar: '✓',
     pointLabelIndex: 0,
     spotlight: false,
-    fill3d: true,
+    penType: 'ballpoint',
+    snapLines: true,
+    polyPoints: [],
     // angle-arc: 3-point state
     arcStage: 0, arcVertex: null, arcP1: null,
 };
@@ -662,6 +1065,16 @@ const state = {
 // Point-label editable input state
 let ptInput = null;
 let ptSavedData = null;
+
+// Pen segment tracking (for non-ballpoint pen types)
+let prevPenX = null, prevPenY = null;
+
+// Stroke point collection (for snap-to-line detection)
+let penPoints = [];
+let penPathLen = 0;
+
+// Polygon fill: snapshot of canvas before first vertex placed
+let polyCanvasSnap = null;
 
 const canvas    = document.getElementById('main-canvas');
 const ctx       = canvas.getContext('2d', { willReadFrequently: true });
@@ -749,8 +1162,32 @@ function updateUI() {
     document.querySelectorAll('.stamp-opt').forEach(s => s.classList.toggle('active', s.dataset.stamp === state.stampChar));
     // Spotlight btn
     document.getElementById('btn-spotlight').classList.toggle('active', state.spotlight);
-    // Fill 3D btn
-    document.getElementById('btn-fill3d').classList.toggle('active', state.fill3d);
+    // Model-select btn + container pointer-events
+    const isModelSelect = state.tool === 'model-select';
+    document.getElementById('btn-model-select').classList.toggle('active', isModelSelect);
+    document.getElementById('models3d-container').classList.toggle('active-models', isModelSelect);
+    if (isModelSelect) canvas.style.pointerEvents = 'none';
+    else canvas.style.pointerEvents = '';
+    // Pen type badge label + card active states
+    const penLabels = { ballpoint:'bi', pencil:'chì', fountain:'mực', calligraphy:'tp', brush:'lông', marker:'dạ' };
+    const badge = document.getElementById('pen-type-badge');
+    if (badge) badge.textContent = penLabels[state.penType] || 'bi';
+    document.querySelectorAll('.pt-card').forEach(c => c.classList.toggle('active', c.dataset.pen === state.penType));
+    // Snap-to-line toggle button
+    const snapBtn = document.getElementById('btn-snap-line');
+    if (snapBtn) {
+        snapBtn.classList.toggle('snap-on', state.snapLines);
+        snapBtn.style.opacity = state.snapLines ? '1' : '0.45';
+    }
+    // Polygon fill button + vertex count badge
+    const polyBtn   = document.getElementById('btn-poly-fill');
+    const polyBadge = document.getElementById('poly-pt-badge');
+    const nPoly = state.polyPoints.length;
+    if (polyBtn) polyBtn.classList.toggle('poly-active', state.tool === 'poly-fill');
+    if (polyBadge) {
+        polyBadge.textContent = nPoly;
+        polyBadge.style.display = nPoly > 0 ? '' : 'none';
+    }
 }
 
 /* ─────────────────────────────────────────────
@@ -781,7 +1218,7 @@ function applyStroke(fn) {
 document.querySelectorAll('.tb[data-tool]').forEach(btn => {
     btn.addEventListener('click', () => {
         if (btn.dataset.tool === 'stamp') return; // handled by stamp popup separately
-        commitCurve(); commitArc();
+        commitCurve(); commitArc(); abortPolyFill();
         state.tool = btn.dataset.tool;
         closeAllPanels();
         updateUI();
@@ -794,7 +1231,7 @@ document.querySelectorAll('.tb[data-tool]').forEach(btn => {
 const stampPopup = document.getElementById('stamp-popup');
 document.getElementById('btn-stamp').addEventListener('click', (e) => {
     e.stopPropagation();
-    commitCurve(); commitArc();
+    commitCurve(); commitArc(); abortPolyFill();
     state.tool = 'stamp';
     const r = e.currentTarget.getBoundingClientRect();
     stampPopup.style.top = r.top + 'px';
@@ -821,7 +1258,7 @@ document.getElementById('btn-shapes').addEventListener('click', (e) => {
 });
 document.querySelectorAll('.si').forEach(item => {
     item.addEventListener('click', () => {
-        commitCurve(); commitArc();
+        commitCurve(); commitArc(); abortPolyFill();
         state.tool = item.dataset.shape;
         shapePanel.classList.remove('open');
         updateUI();
@@ -830,6 +1267,8 @@ document.querySelectorAll('.si').forEach(item => {
 function closeAllPanels() {
     shapePanel.classList.remove('open');
     stampPopup.classList.remove('open');
+    document.getElementById('models3d-panel')?.classList.remove('open');
+    document.getElementById('pen-types-panel')?.classList.remove('open');
 }
 document.addEventListener('click', e => {
     if (!shapePanel.contains(e.target) && e.target !== document.getElementById('btn-shapes'))
@@ -848,7 +1287,6 @@ document.getElementById('btn-undo').addEventListener('click', undo);
 document.getElementById('btn-redo').addEventListener('click', redo);
 document.getElementById('btn-clear').addEventListener('click', () => { ctx.clearRect(0,0,canvas.width,canvas.height); saveState(); });
 document.getElementById('btn-reset-pts').addEventListener('click', () => { state.pointLabelIndex = 0; updateUI(); });
-document.getElementById('btn-fill3d').addEventListener('click', () => { state.fill3d = !state.fill3d; updateUI(); });
 
 /* ─────────────────────────────────────────────
    SPOTLIGHT
@@ -882,6 +1320,321 @@ board.addEventListener('mouseleave', () => { laserDot.style.display = 'none'; })
 /* ─────────────────────────────────────────────
    DOWNLOAD
 ───────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   3D MODELS SYSTEM — 10 mô hình không gian màu sắc, kéo thả
+═══════════════════════════════════════════════════════════════ */
+const MODEL3D_LIST = [
+    { id:'sphere',       name:'Hình cầu',        accent:'#3b82f6' },
+    { id:'cylinder',     name:'Hình trụ',         accent:'#10b981' },
+    { id:'cone',         name:'Hình nón',         accent:'#f59e0b' },
+    { id:'cube',         name:'Lập phương',       accent:'#8b5cf6' },
+    { id:'cuboid',       name:'Hình hộp CN',     accent:'#0891b2' },
+    { id:'prism-tri',    name:'Lăng trụ △',     accent:'#ec4899' },
+    { id:'prism-hex',    name:'Lăng trụ ⬡',    accent:'#f97316' },
+    { id:'pyramid-tri',  name:'Chóp tam giác',    accent:'#ef4444' },
+    { id:'pyramid-quad', name:'Chóp tứ giác',     accent:'#22c55e' },
+    { id:'frustum',      name:'Hình chóp cụt',   accent:'#06b6d4' },
+];
+
+let modelUidCounter = 0;
+
+function makeModel3DSvg(type, uid) {
+    switch(type) {
+    case 'sphere': return `<svg viewBox="0 0 120 90" xmlns="http://www.w3.org/2000/svg">
+<defs><radialGradient id="sg${uid}" cx="37%" cy="30%" r="70%">
+<stop offset="0%" stop-color="#bfdbfe"/><stop offset="42%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#1e3a8a"/>
+</radialGradient></defs>
+<circle cx="60" cy="44" r="34" fill="url(#sg${uid})" stroke="#1d4ed8" stroke-width="1.8"/>
+<ellipse cx="60" cy="44" rx="34" ry="9" fill="none" stroke="#93c5fd" stroke-width="1.2" stroke-dasharray="5,3" opacity="0.8"/>
+<ellipse cx="60" cy="33" rx="20" ry="5" fill="rgba(219,234,254,0.28)" stroke="none"/>
+</svg>`;
+
+    case 'cylinder': return `<svg viewBox="0 0 120 90" xmlns="http://www.w3.org/2000/svg">
+<defs><linearGradient id="cg${uid}" x1="0%" y1="0%" x2="100%" y2="0%">
+<stop offset="0%" stop-color="#064e3b"/><stop offset="28%" stop-color="#6ee7b7"/>
+<stop offset="62%" stop-color="#059669"/><stop offset="100%" stop-color="#064e3b"/>
+</linearGradient></defs>
+<rect x="20" y="22" width="80" height="52" fill="url(#cg${uid})"/>
+<ellipse cx="60" cy="74" rx="40" ry="11" fill="#10b981" stroke="#064e3b" stroke-width="1.8"/>
+<ellipse cx="60" cy="22" rx="40" ry="11" fill="#a7f3d0" stroke="#059669" stroke-width="1.8"/>
+<line x1="20" y1="22" x2="20" y2="74" stroke="#065f46" stroke-width="1.5"/>
+<line x1="100" y1="22" x2="100" y2="74" stroke="#065f46" stroke-width="1.5"/>
+<ellipse cx="60" cy="30" rx="24" ry="5" fill="rgba(209,250,229,0.25)" stroke="none"/>
+</svg>`;
+
+    case 'cone': return `<svg viewBox="0 0 120 90" xmlns="http://www.w3.org/2000/svg">
+<defs><linearGradient id="ng${uid}" x1="0%" y1="0%" x2="100%" y2="0%">
+<stop offset="0%" stop-color="#92400e"/><stop offset="32%" stop-color="#fde68a"/>
+<stop offset="68%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#78350f"/>
+</linearGradient></defs>
+<polygon points="60,7 15,78 105,78" fill="url(#ng${uid})" stroke="#b45309" stroke-width="1.8"/>
+<ellipse cx="60" cy="78" rx="45" ry="11" fill="#f59e0b" stroke="#b45309" stroke-width="1.8"/>
+<ellipse cx="60" cy="78" rx="45" ry="11" fill="none" stroke="#fde68a" stroke-width="1" stroke-dasharray="5,4" opacity="0.55"/>
+<polygon points="60,7 35,50 85,50" fill="rgba(254,243,199,0.18)" stroke="none"/>
+</svg>`;
+
+    case 'cube': return `<svg viewBox="0 0 120 90" xmlns="http://www.w3.org/2000/svg">
+<polygon points="8,30 68,30 68,82 8,82" fill="#8b5cf6" fill-opacity="0.72" stroke="#6d28d9" stroke-width="1.8"/>
+<polygon points="8,30 30,11 90,11 68,30" fill="#c4b5fd" fill-opacity="0.88" stroke="#7c3aed" stroke-width="1.8"/>
+<polygon points="68,30 90,11 90,63 68,82" fill="#4c1d95" fill-opacity="0.88" stroke="#5b21b6" stroke-width="1.8"/>
+<polyline points="8,82 30,63 90,63" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.55"/>
+<line x1="30" y1="11" x2="30" y2="63" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.55"/>
+<polygon points="15,30 40,18 65,30 40,42" fill="rgba(237,233,254,0.18)" stroke="none"/>
+</svg>`;
+
+    case 'cuboid': return `<svg viewBox="0 0 120 90" xmlns="http://www.w3.org/2000/svg">
+<polygon points="6,33 84,33 84,82 6,82" fill="#0891b2" fill-opacity="0.70" stroke="#0e7490" stroke-width="1.8"/>
+<polygon points="6,33 26,14 104,14 84,33" fill="#a5f3fc" fill-opacity="0.85" stroke="#0891b2" stroke-width="1.8"/>
+<polygon points="84,33 104,14 104,63 84,82" fill="#164e63" fill-opacity="0.88" stroke="#0e7490" stroke-width="1.8"/>
+<polyline points="6,82 26,63 104,63" fill="none" stroke="#0891b2" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.5"/>
+<line x1="26" y1="14" x2="26" y2="63" stroke="#0891b2" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.5"/>
+<polygon points="18,33 44,20 70,33 44,46" fill="rgba(207,250,254,0.18)" stroke="none"/>
+</svg>`;
+
+    case 'prism-tri': return `<svg viewBox="0 0 120 90" xmlns="http://www.w3.org/2000/svg">
+<polygon points="8,30 92,30 92,84 8,84" fill="#ec4899" fill-opacity="0.65" stroke="#be185d" stroke-width="1.8"/>
+<polygon points="8,30 92,30 50,8" fill="#fbcfe8" fill-opacity="0.88" stroke="#ec4899" stroke-width="1.8"/>
+<polygon points="92,30 50,8 50,66 92,84" fill="#9d174d" fill-opacity="0.78" stroke="#be185d" stroke-width="1.8"/>
+<polyline points="8,84 50,66 50,8" fill="none" stroke="#ec4899" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.5"/>
+<line x1="8" y1="30" x2="50" y2="8" stroke="#ec4899" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.5"/>
+<polygon points="22,30 65,20 65,30" fill="rgba(253,242,248,0.2)" stroke="none"/>
+</svg>`;
+
+    case 'prism-hex': return `<svg viewBox="0 0 120 90" xmlns="http://www.w3.org/2000/svg">
+<polygon points="92,22 76,36 44,36 28,22 44,8 76,8" fill="#fde68a" fill-opacity="0.88" stroke="#d97706" stroke-width="1.8"/>
+<polygon points="28,22 44,36 44,78 28,64" fill="#f59e0b" fill-opacity="0.72" stroke="#d97706" stroke-width="1.8"/>
+<polygon points="44,36 76,36 76,78 44,78" fill="#b45309" fill-opacity="0.72" stroke="#92400e" stroke-width="1.8"/>
+<polygon points="76,36 92,22 92,64 76,78" fill="#92400e" fill-opacity="0.78" stroke="#78350f" stroke-width="1.8"/>
+<polyline points="28,64 44,78 76,78 92,64" fill="none" stroke="#d97706" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.45"/>
+<polygon points="44,22 68,14 92,22 68,30" fill="rgba(254,252,232,0.2)" stroke="none"/>
+</svg>`;
+
+    case 'pyramid-tri': return `<svg viewBox="0 0 120 90" xmlns="http://www.w3.org/2000/svg">
+<polygon points="50,7 8,82 90,82" fill="#ef4444" fill-opacity="0.72" stroke="#dc2626" stroke-width="1.8"/>
+<polygon points="50,7 90,82 58,66" fill="#b91c1c" fill-opacity="0.72" stroke="#991b1b" stroke-width="1.8"/>
+<polygon points="50,7 8,82 58,66" fill="#991b1b" fill-opacity="0.55" stroke="#7f1d1d" stroke-width="1.2" stroke-dasharray="5,3"/>
+<polyline points="8,82 58,66 90,82" fill="none" stroke="#ef4444" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.55"/>
+<line x1="50" y1="7" x2="58" y2="66" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3" opacity="0.45"/>
+<polygon points="50,7 30,50 70,50" fill="rgba(254,226,226,0.18)" stroke="none"/>
+</svg>`;
+
+    case 'pyramid-quad': return `<svg viewBox="0 0 120 90" xmlns="http://www.w3.org/2000/svg">
+<polygon points="50,6 8,82 76,86" fill="#4ade80" fill-opacity="0.72" stroke="#16a34a" stroke-width="1.8"/>
+<polygon points="50,6 76,86 96,68" fill="#16a34a" fill-opacity="0.70" stroke="#15803d" stroke-width="1.8"/>
+<polygon points="50,6 8,82 28,64" fill="#166534" fill-opacity="0.60" stroke="#14532d" stroke-width="1.4" stroke-dasharray="0"/>
+<polyline points="8,82 28,64 96,68 76,86" fill="none" stroke="#4ade80" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.5"/>
+<line x1="28" y1="64" x2="76" y2="86" stroke="#4ade80" stroke-width="1" stroke-dasharray="4,3" opacity="0.45"/>
+<line x1="50" y1="6" x2="28" y2="64" stroke="#16a34a" stroke-width="1.4"/>
+<polygon points="50,6 30,50 70,50" fill="rgba(220,252,231,0.2)" stroke="none"/>
+</svg>`;
+
+    case 'frustum': return `<svg viewBox="0 0 120 90" xmlns="http://www.w3.org/2000/svg">
+<defs><linearGradient id="fg${uid}" x1="0%" y1="0%" x2="100%" y2="0%">
+<stop offset="0%" stop-color="#0c4a6e"/><stop offset="28%" stop-color="#67e8f9"/>
+<stop offset="65%" stop-color="#0891b2"/><stop offset="100%" stop-color="#083344"/>
+</linearGradient></defs>
+<polygon points="14,78 36,22 84,22 106,78" fill="url(#fg${uid})" stroke="#0e7490" stroke-width="1.8"/>
+<ellipse cx="60" cy="78" rx="46" ry="12" fill="#0891b2" fill-opacity="0.88" stroke="#0e7490" stroke-width="1.8"/>
+<ellipse cx="60" cy="22" rx="24" ry="7" fill="#a5f3fc" fill-opacity="0.92" stroke="#0891b2" stroke-width="1.8"/>
+<ellipse cx="60" cy="78" rx="46" ry="12" fill="none" stroke="#67e8f9" stroke-width="1" stroke-dasharray="5,4" opacity="0.45"/>
+<polygon points="36,22 84,22 75,40 45,40" fill="rgba(207,250,254,0.22)" stroke="none"/>
+</svg>`;
+
+    default: return `<svg viewBox="0 0 120 90" xmlns="http://www.w3.org/2000/svg"><text x="60" y="50" text-anchor="middle" fill="#94a3b8" font-size="11">${type}</text></svg>`;
+    }
+}
+
+/* --- Populate models panel --- */
+const m3dGrid = document.getElementById('m3d-grid');
+MODEL3D_LIST.forEach(m => {
+    const card = document.createElement('div');
+    card.className = 'm3d-card';
+    card.dataset.modelId = m.id;
+    card.innerHTML = `${makeModel3DSvg(m.id, 'thumb_'+m.id)}<div class="m3d-card-name" style="color:${m.accent}">${m.name}</div>`;
+    card.addEventListener('click', () => placeModel3D(m.id));
+    m3dGrid.appendChild(card);
+});
+
+/* --- Place model on board --- */
+function placeModel3D(modelId) {
+    const uid = ++modelUidCounter;
+    const boardR = board.getBoundingClientRect();
+    const W = Math.round(boardR.width * 0.22);
+    const H = Math.round(W * 0.78);
+    const left = Math.round(boardR.width / 2 - W / 2 + (Math.random() - .5) * 120);
+    const top  = Math.round(boardR.height / 2 - H / 2 + (Math.random() - .5) * 80);
+
+    const ov = document.createElement('div');
+    ov.className = 'model3d-ov';
+    ov.style.cssText = `left:${left}px;top:${top}px;width:${W}px;height:${H}px;`;
+    ov.dataset.uid = uid;
+
+    ov.innerHTML = `
+        ${makeModel3DSvg(modelId, 'ov'+uid)}
+        <div class="m3d-del" title="Xoá">×</div>
+        <div class="m3d-rz" title="Kéo để thay đổi kích thước">⤡</div>
+        <div class="m3d-drag" title="Kéo để di chuyển"></div>
+    `;
+
+    ov.querySelector('.m3d-del').addEventListener('click', e => {
+        e.stopPropagation(); ov.remove();
+    });
+
+    document.getElementById('models3d-container').appendChild(ov);
+
+    // Auto switch to model-select mode
+    commitCurve(); commitArc();
+    state.tool = 'model-select';
+    closeAllPanels();
+    updateUI();
+}
+
+/* --- Drag & Resize for model overlays --- */
+let mActive = null; // { el, action, sx, sy, spx, spy, sw, sh, asp }
+
+document.getElementById('models3d-container').addEventListener('mousedown', startModelInteract);
+document.getElementById('models3d-container').addEventListener('touchstart', startModelInteract, { passive: false });
+
+function startModelInteract(e) {
+    if (state.tool !== 'model-select') return;
+    const ov = e.target.closest('.model3d-ov');
+    if (!ov) return;
+    if (e.target.classList.contains('m3d-del')) return;
+
+    e.preventDefault(); e.stopPropagation();
+    const isRz = e.target.classList.contains('m3d-rz');
+    const pt = e.touches ? e.touches[0] : e;
+    mActive = {
+        el: ov,
+        action: isRz ? 'resize' : 'drag',
+        sx: pt.clientX, sy: pt.clientY,
+        spx: parseInt(ov.style.left), spy: parseInt(ov.style.top),
+        sw: ov.offsetWidth, sh: ov.offsetHeight,
+        asp: ov.offsetWidth / ov.offsetHeight,
+    };
+}
+
+function onModelMove(e) {
+    if (!mActive) return;
+    e.preventDefault();
+    const pt = e.touches ? e.touches[0] : e;
+    const dx = pt.clientX - mActive.sx;
+    const dy = pt.clientY - mActive.sy;
+    const el = mActive.el;
+    if (mActive.action === 'drag') {
+        el.style.left = (mActive.spx + dx) + 'px';
+        el.style.top  = (mActive.spy + dy) + 'px';
+    } else {
+        const nw = Math.max(60, mActive.sw + dx);
+        el.style.width  = nw + 'px';
+        el.style.height = Math.round(nw / mActive.asp) + 'px';
+    }
+}
+
+function onModelEnd() { mActive = null; }
+
+window.addEventListener('mousemove', onModelMove);
+window.addEventListener('touchmove', onModelMove, { passive: false });
+window.addEventListener('mouseup', onModelEnd);
+window.addEventListener('touchend', onModelEnd);
+window.addEventListener('touchcancel', onModelEnd);
+
+/* --- models3d panel open/close --- */
+const models3dPanel = document.getElementById('models3d-panel');
+document.getElementById('btn-models3d').addEventListener('click', e => {
+    e.stopPropagation();
+    models3dPanel.classList.toggle('open');
+    document.getElementById('shape-panel').classList.remove('open');
+    stampPopup.classList.remove('open');
+});
+document.addEventListener('click', e => {
+    if (!models3dPanel.contains(e.target) && e.target !== document.getElementById('btn-models3d'))
+        models3dPanel.classList.remove('open');
+});
+
+/* --- model-select tool button --- */
+document.getElementById('btn-model-select').addEventListener('click', () => {
+    commitCurve(); commitArc(); abortPolyFill();
+    if (state.tool === 'model-select') {
+        state.tool = 'pen'; // toggle off
+    } else {
+        state.tool = 'model-select';
+    }
+    closeAllPanels();
+    updateUI();
+});
+
+/* keyboard shortcut M for model-select */
+
+/* ─────────────────────────────────────────────
+   POLYGON FILL BUTTON & DOUBLE-CLICK CLOSE
+───────────────────────────────────────────── */
+document.getElementById('btn-poly-fill').addEventListener('click', () => {
+    commitCurve(); commitArc();
+    if (state.tool === 'poly-fill') {
+        // If already in poly mode and we have ≥3 pts → close polygon
+        if (state.polyPoints.length >= 3) {
+            commitPolyFill();
+        } else {
+            abortPolyFill();
+            state.tool = 'pen';
+        }
+    } else {
+        abortPolyFill();
+        state.tool = 'poly-fill';
+    }
+    closeAllPanels();
+    updateUI();
+});
+
+// Double-click on canvas → close polygon immediately
+canvas.addEventListener('dblclick', e => {
+    if (state.tool === 'poly-fill' && state.polyPoints.length >= 3) {
+        e.preventDefault();
+        commitPolyFill();
+    }
+});
+
+/* ─────────────────────────────────────────────
+   SNAP-TO-LINE TOGGLE
+───────────────────────────────────────────── */
+document.getElementById('btn-snap-line').addEventListener('click', () => {
+    state.snapLines = !state.snapLines;
+    updateUI();
+});
+
+/* ─────────────────────────────────────────────
+   PEN TYPES PANEL
+───────────────────────────────────────────── */
+const penTypesPanel = document.getElementById('pen-types-panel');
+
+document.getElementById('btn-pen-types').addEventListener('click', e => {
+    e.stopPropagation();
+    penTypesPanel.classList.toggle('open');
+    document.getElementById('shape-panel').classList.remove('open');
+    stampPopup.classList.remove('open');
+    models3dPanel.classList.remove('open');
+});
+
+// Close pen panel when clicking outside
+document.addEventListener('click', e => {
+    if (!penTypesPanel.contains(e.target) && e.target !== document.getElementById('btn-pen-types'))
+        penTypesPanel.classList.remove('open');
+});
+
+// Card selection
+document.querySelectorAll('.pt-card').forEach(card => {
+    card.addEventListener('click', e => {
+        e.stopPropagation();
+        state.penType = card.dataset.pen;
+        // Switch to pen tool automatically
+        commitCurve(); commitArc(); abortPolyFill();
+        state.tool = 'pen';
+        penTypesPanel.classList.remove('open');
+        updateUI();
+    });
+});
+
 /* ─────────────────────────────────────────────
    FULLSCREEN
 ───────────────────────────────────────────── */
@@ -908,6 +1661,24 @@ document.addEventListener('keydown', e => {
     if (e.key === 'F11') { e.preventDefault(); btnFS.click(); }
 });
 
+/* ─── Tải PNG trong suốt – chỉ nét vẽ, không nền ─── */
+document.getElementById('btn-download-transparent').addEventListener('click', () => {
+    // Canvas nội tại đã có nền trong suốt; chỉ cần export thẳng
+    const dataURL = canvas.toDataURL('image/png');          // PNG lossless, max quality
+    const a = document.createElement('a');
+    const ts = new Date().toISOString().slice(0,16).replace(/[T:]/g,'-');
+    a.download = `ban-ve-transparent-${ts}.png`;
+    a.href = dataURL;
+    a.click();
+    // Brief toast confirmation
+    const t = document.getElementById('dl-toast');
+    if (t) {
+        clearTimeout(t._timer);
+        t.classList.add('show');
+        t._timer = setTimeout(() => t.classList.remove('show'), 2000);
+    }
+});
+
 document.getElementById('btn-download').addEventListener('click', () => {
     const t = document.createElement('canvas');
     t.width = canvas.width; t.height = canvas.height;
@@ -931,6 +1702,88 @@ document.getElementById('btn-download').addEventListener('click', () => {
 });
 
 /* ─────────────────────────────────────────────
+   IMAGE UPLOAD (file picker + drag-onto-board)
+───────────────────────────────────────────── */
+(function initImageUpload() {
+    const uploadBtn   = document.getElementById('btn-upload-img');
+    const fileInput   = document.getElementById('img-file-input');
+    const toast       = document.getElementById('upload-toast');
+    let toastTimer;
+
+    function showToast(msg, ms = 2600) {
+        clearTimeout(toastTimer);
+        toast.textContent = msg;
+        toast.classList.add('show');
+        toastTimer = setTimeout(() => toast.classList.remove('show'), ms);
+    }
+
+    /* validate & load an image File/Blob onto the paste overlay */
+    function loadImgFile(file) {
+        if (!file || !file.type.startsWith('image/')) {
+            showToast('⚠️ Chỉ hỗ trợ file ảnh (PNG, JPG, GIF, WebP…)');
+            return;
+        }
+        if (file.size > 20 * 1024 * 1024) {
+            showToast('⚠️ File quá lớn (tối đa 20 MB)');
+            return;
+        }
+        const rd = new FileReader();
+        rd.onload = ev => {
+            const img = new Image();
+            img.src = ev.target.result;
+            img.onload = () => {
+                /* reuse the existing paste-overlay & ps state */
+                let w = img.naturalWidth, h = img.naturalHeight;
+                const mw = canvas.width * .55, mh = canvas.height * .55;
+                if (w > mw || h > mh) {
+                    const r = Math.min(mw / w, mh / h);
+                    w = Math.round(w * r); h = Math.round(h * r);
+                }
+                ps.x = Math.round((canvas.width  - w) / 2);
+                ps.y = Math.round((canvas.height - h) / 2);
+                ps.w = w; ps.h = h;
+                ps.img = img;
+                ps.active = true;
+                pasteImg.src = img.src;
+                syncPasteOv();
+                pasteOv.classList.remove('hidden');
+                showToast('✅ Kéo để di chuyển · Kéo ○ để thay đổi kích thước · ✓ để chèn vào bảng');
+            };
+            img.onerror = () => showToast('⚠️ Không đọc được file ảnh');
+        };
+        rd.readAsDataURL(file);
+    }
+
+    /* Button → file picker */
+    uploadBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files[0]) loadImgFile(fileInput.files[0]);
+        fileInput.value = ''; // allow re-select same file
+    });
+
+    /* Drag image file onto the board */
+    board.addEventListener('dragenter', e => { e.preventDefault(); });
+    board.addEventListener('dragover',  e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+    board.addEventListener('drop', e => {
+        e.preventDefault();
+        // dragged file
+        const file = e.dataTransfer.files?.[0];
+        if (file && file.type.startsWith('image/')) { loadImgFile(file); return; }
+        // dragged image element from browser (url)
+        const url = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain');
+        if (url && /^https?:\/\//.test(url)) {
+            const img = new Image(); img.crossOrigin = 'anonymous'; img.src = url;
+            img.onload = () => loadImgFile(/* wrap in pseudo-file via canvas */ (() => {
+                // convert URL image to blob
+                const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight;
+                c.getContext('2d').drawImage(img, 0, 0);
+                c.toBlob(b => loadImgFile(b), 'image/png');
+            })());
+        }
+    });
+})();
+
+/* ─────────────────────────────────────────────
    PASTE
 ───────────────────────────────────────────── */
 const pasteOv   = document.getElementById('paste-ov');
@@ -946,10 +1799,10 @@ window.addEventListener('paste', e => {
             rd.onload = ev => {
                 const img = new Image(); img.src = ev.target.result;
                 img.onload = () => {
-                    let w=img.width, h=img.height;
-                    const mw=canvas.width*.5, mh=canvas.height*.5;
-                    if (w>mw||h>mh) { const r=Math.min(mw/w,mh/h); w*=r; h*=r; }
-                    ps.x=(canvas.width-w)/2; ps.y=(canvas.height-h)/2; ps.w=w; ps.h=h;
+                    let w=img.naturalWidth, h=img.naturalHeight;
+                    const mw=canvas.width*.55, mh=canvas.height*.55;
+                    if (w>mw||h>mh) { const r=Math.min(mw/w,mh/h); w=Math.round(w*r); h=Math.round(h*r); }
+                    ps.x=Math.round((canvas.width-w)/2); ps.y=Math.round((canvas.height-h)/2); ps.w=w; ps.h=h;
                     ps.img=img; ps.active=true; pasteImg.src=img.src; syncPasteOv(); pasteOv.classList.remove('hidden');
                 };
             };
@@ -957,32 +1810,75 @@ window.addEventListener('paste', e => {
         }
     }
 });
+/* FIX: set each property directly — cssText += caused duplicates overwriting resize state */
 function syncPasteOv() {
-    pasteOv.style.cssText += `left:${ps.x}px;top:${ps.y}px;width:${ps.w}px;height:${ps.h}px;`;
+    pasteOv.style.left   = ps.x + 'px';
+    pasteOv.style.top    = ps.y + 'px';
+    pasteOv.style.width  = ps.w + 'px';
+    pasteOv.style.height = ps.h + 'px';
 }
 function epos(e) { return e.touches?.length ? {x:e.touches[0].clientX,y:e.touches[0].clientY} : {x:e.clientX,y:e.clientY}; }
-pasteOv.addEventListener('mousedown', e => { if (e.target.closest('button')) return; e.preventDefault(); ps.action='move'; const p=epos(e); ps.sx=p.x; ps.sy=p.y; ps.spx=ps.x; ps.spy=ps.y; });
-pasteOv.addEventListener('touchstart', e => { if (e.target.closest('button')) return; e.preventDefault(); ps.action='move'; const p=epos(e); ps.sx=p.x; ps.sy=p.y; ps.spx=ps.x; ps.spy=ps.y; }, {passive:false});
-rzHandle.addEventListener('mousedown', e => { e.preventDefault(); ps.action='resize'; ps.sx=epos(e).x; ps.sw=ps.w; ps.sh=ps.h; });
-rzHandle.addEventListener('touchstart', e => { e.preventDefault(); ps.action='resize'; ps.sx=epos(e).x; ps.sw=ps.w; ps.sh=ps.h; }, {passive:false});
+
+/* Move — skip if click originated from resize handle or buttons */
+pasteOv.addEventListener('mousedown', e => {
+    if (e.target === rzHandle || e.target.closest('button')) return;
+    e.preventDefault();
+    ps.action='move'; const p=epos(e); ps.sx=p.x; ps.sy=p.y; ps.spx=ps.x; ps.spy=ps.y;
+});
+pasteOv.addEventListener('touchstart', e => {
+    if (e.target === rzHandle || e.target.closest('button')) return;
+    e.preventDefault();
+    ps.action='move'; const p=epos(e); ps.sx=p.x; ps.sy=p.y; ps.spx=ps.x; ps.spy=ps.y;
+}, {passive:false});
+
+/* FIX: stopPropagation so resize mousedown doesn't bubble up and overwrite ps.action='move' */
+rzHandle.addEventListener('mousedown', e => {
+    e.preventDefault(); e.stopPropagation();
+    ps.action='resize'; const p=epos(e); ps.sx=p.x; ps.sy=p.y; ps.sw=ps.w; ps.sh=ps.h;
+});
+rzHandle.addEventListener('touchstart', e => {
+    e.preventDefault(); e.stopPropagation();
+    ps.action='resize'; const p=epos(e); ps.sx=p.x; ps.sy=p.y; ps.sw=ps.w; ps.sh=ps.h;
+}, {passive:false});
+
 window.addEventListener('mousemove', e => {
     if (!ps.action) return; e.preventDefault();
     const p=epos(e), dx=p.x-ps.sx, dy=p.y-ps.sy;
-    if (ps.action==='move') { ps.x=ps.spx+dx; ps.y=ps.spy+dy; }
-    else { const r=ps.sw/ps.sh; ps.w=Math.max(30,ps.sw+dx); ps.h=ps.w/r; }
+    if (ps.action==='move') {
+        ps.x=ps.spx+dx; ps.y=ps.spy+dy;
+    } else {
+        /* resize: track both axes, use whichever gives larger delta */
+        const delta = Math.abs(dx) >= Math.abs(dy) ? dx : dy;
+        const r = ps.sw / ps.sh;
+        ps.w = Math.max(40, ps.sw + delta);
+        ps.h = Math.round(ps.w / r);
+    }
     syncPasteOv();
 });
 window.addEventListener('touchmove', e => {
     if (!ps.action) return; e.preventDefault();
     const p=epos(e), dx=p.x-ps.sx, dy=p.y-ps.sy;
-    if (ps.action==='move') { ps.x=ps.spx+dx; ps.y=ps.spy+dy; }
-    else { const r=ps.sw/ps.sh; ps.w=Math.max(30,ps.sw+dx); ps.h=ps.w/r; }
+    if (ps.action==='move') {
+        ps.x=ps.spx+dx; ps.y=ps.spy+dy;
+    } else {
+        const delta = Math.abs(dx) >= Math.abs(dy) ? dx : dy;
+        const r = ps.sw / ps.sh;
+        ps.w = Math.max(40, ps.sw + delta);
+        ps.h = Math.round(ps.w / r);
+    }
     syncPasteOv();
 }, {passive:false});
+
 ['mouseup','touchend','touchcancel'].forEach(ev => window.addEventListener(ev, () => ps.action=null));
+
 document.getElementById('btn-pa-confirm').addEventListener('click', () => {
     if (!ps.active) return;
+    /* FIX: high-quality rendering when stamping image to canvas */
+    ctx.save();
+    ctx.imageSmoothingEnabled  = true;
+    ctx.imageSmoothingQuality  = 'high';
     ctx.drawImage(ps.img, ps.x, ps.y, ps.w, ps.h);
+    ctx.restore();
     saveState(); pasteOv.classList.add('hidden'); ps.active=false;
 });
 document.getElementById('btn-pa-cancel').addEventListener('click', () => { pasteOv.classList.add('hidden'); ps.active=false; });
@@ -1083,24 +1979,6 @@ function finalizePtLabel(cancel) {
     ptSavedData = null;
     saveState();
     updateUI();
-}
-
-/* Parse hex color → three face shades for 3D fills */
-function getFaceColors(hex) {
-    let r=30,g=30,b=138;
-    if (/^#[0-9a-f]{6}$/i.test(hex)) {
-        r=parseInt(hex.slice(1,3),16);
-        g=parseInt(hex.slice(3,5),16);
-        b=parseInt(hex.slice(5,7),16);
-    }
-    const cl=(v,d)=>Math.min(255,Math.max(0,v+d));
-    return {
-        top:       `rgba(${cl(r,100)},${cl(g,100)},${cl(b,100)},0.82)`,
-        front:     `rgba(${r},${g},${b},0.68)`,
-        side:      `rgba(${cl(r,-65)},${cl(g,-65)},${cl(b,-65)},0.82)`,
-        ellipTop:  `rgba(${cl(r,120)},${cl(g,120)},${cl(b,120)},0.88)`,
-        rgb: [r,g,b],
-    };
 }
 
 function arrowHead(x1,y1,x2,y2) {
@@ -1209,18 +2087,99 @@ function handleStart(e) {
         return;
     }
 
+    /* POLYGON FILL – click sequence */
+    if (state.tool === 'poly-fill') {
+        const CLOSE_R = 16;
+
+        if (state.polyPoints.length === 0) {
+            // First vertex: snapshot canvas so we can cancel later
+            polyCanvasSnap = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        } else if (state.polyPoints.length >= 3) {
+            // Close polygon if clicking near the first point
+            const fp = state.polyPoints[0];
+            if (Math.hypot(x - fp.x, y - fp.y) < CLOSE_R) {
+                commitPolyFill();
+                return;
+            }
+        }
+
+        const prev = state.polyPoints.length > 0
+            ? state.polyPoints[state.polyPoints.length - 1] : null;
+        state.polyPoints.push({x, y});
+
+        // Draw vertex dot + edge on main canvas
+        ctx.save();
+        ctx.globalCompositeOperation = 'source-over';
+        if (prev) {
+            ctx.strokeStyle = state.color;
+            ctx.lineWidth   = state.lineWidth;
+            ctx.lineCap     = 'round'; ctx.setLineDash([]);
+            ctx.beginPath(); ctx.moveTo(prev.x, prev.y); ctx.lineTo(x, y); ctx.stroke();
+        }
+        // Dot with white halo
+        ctx.fillStyle = state.color;
+        ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.stroke();
+        ctx.restore();
+
+        updateUI();
+        return;
+    }
+
     /* Default */
     state.isDrawing=true; startPos={x,y};
     savedData=ctx.getImageData(0,0,canvas.width,canvas.height);
     ctx.beginPath(); ctx.moveTo(x,y);
     ctx.lineWidth=state.lineWidth; ctx.lineCap='round'; ctx.lineJoin='round';
     ctx.strokeStyle=state.tool==='eraser'?'#fff':state.color;
+    prevPenX = x; prevPenY = y;
+    penPoints = [{x, y}]; penPathLen = 0;
 }
 
 /* ─────────────────────────────────────────────
    HANDLE MOVE
 ───────────────────────────────────────────── */
 function handleMove(e) {
+    /* Polygon fill preview */
+    if (state.tool === 'poly-fill' && state.polyPoints.length > 0) {
+        const {x, y} = getXY(e);
+        tmpCtx.clearRect(0, 0, tmpCanvas.width, tmpCanvas.height);
+        const last  = state.polyPoints[state.polyPoints.length - 1];
+        const first = state.polyPoints[0];
+        tmpCtx.save();
+        // Dashed guide line from last vertex to cursor
+        tmpCtx.strokeStyle = state.color;
+        tmpCtx.lineWidth   = Math.max(1.2, state.lineWidth * 0.7);
+        tmpCtx.setLineDash([6, 5]);
+        tmpCtx.globalAlpha = 0.65;
+        tmpCtx.lineCap = 'round';
+        tmpCtx.beginPath(); tmpCtx.moveTo(last.x, last.y); tmpCtx.lineTo(x, y); tmpCtx.stroke();
+        // Green closing ring when near first point (≥3 vertices placed)
+        if (state.polyPoints.length >= 3) {
+            const d = Math.hypot(x - first.x, y - first.y);
+            if (d < 36) {
+                const alpha = Math.max(0, 1 - d / 36);
+                tmpCtx.setLineDash([]);
+                tmpCtx.globalAlpha = alpha * 0.9;
+                tmpCtx.strokeStyle = '#10b981';
+                tmpCtx.lineWidth = 2.5;
+                tmpCtx.beginPath(); tmpCtx.arc(first.x, first.y, 14, 0, Math.PI * 2); tmpCtx.stroke();
+                // Fill preview of complete polygon
+                tmpCtx.globalAlpha = alpha * 0.15;
+                tmpCtx.fillStyle = state.color;
+                tmpCtx.beginPath();
+                tmpCtx.moveTo(first.x, first.y);
+                state.polyPoints.forEach(p => tmpCtx.lineTo(p.x, p.y));
+                tmpCtx.lineTo(x, y);
+                tmpCtx.closePath(); tmpCtx.fill();
+            }
+        }
+        tmpCtx.setLineDash([]); tmpCtx.globalAlpha = 1;
+        tmpCtx.restore();
+        return;
+    }
+
     /* Angle arc preview */
     if (state.tool === 'angle-arc' && state.arcStage > 0) {
         const {x,y}=getXY(e);
@@ -1251,7 +2210,18 @@ function handleMove(e) {
     /* PEN */
     if (state.tool==='pen') {
         ctx.globalCompositeOperation='source-over';
-        ctx.lineTo(x,y); ctx.stroke();
+        // Collect points for snap-to-line detection
+        if (penPoints.length > 0) {
+            const last = penPoints[penPoints.length - 1];
+            penPathLen += Math.hypot(x - last.x, y - last.y);
+        }
+        penPoints.push({x, y});
+        if (state.penType === 'ballpoint') {
+            ctx.lineTo(x,y); ctx.stroke();
+        } else {
+            drawPenSegment(x, y);
+        }
+        prevPenX = x; prevPenY = y;
 
     /* HIGHLIGHT */
     } else if (state.tool==='highlight') {
@@ -1392,20 +2362,12 @@ function handleMove(e) {
         } else if (state.tool==='isosceles-triangle') {
             ctx.moveTo(lf+w/2,tp); ctx.lineTo(lf,bt); ctx.lineTo(rt,bt); ctx.closePath();
 
-        // ──── 3D shapes (with optional color fill) ────
+        // ──── 3D shapes (wireframe) ────
         } else if (w>5&&h>5) {
-            const fc = state.fill3d ? getFaceColors(state.color) : null;
             ctx.setLineDash([]);
 
             if (state.tool==='sphere') {
                 const scx=lf+w/2, scy=tp+h/2, sr=Math.min(w,h)/2;
-                if (fc) {
-                    const gr=ctx.createRadialGradient(scx-sr*.3,scy-sr*.3,sr*.04,scx,scy,sr);
-                    gr.addColorStop(0, fc.ellipTop); gr.addColorStop(0.45, fc.top);
-                    gr.addColorStop(0.8, fc.front);  gr.addColorStop(1, fc.side);
-                    ctx.beginPath(); ctx.arc(scx,scy,sr,0,Math.PI*2);
-                    ctx.fillStyle=gr; ctx.fill();
-                }
                 ctx.beginPath(); ctx.arc(scx,scy,sr,0,Math.PI*2); ctx.stroke();
                 ctx.beginPath(); ctx.ellipse(scx,scy,sr,sr*.25,0,0,Math.PI); ctx.stroke();
                 ctx.setLineDash([5,5]); ctx.beginPath(); ctx.ellipse(scx,scy,sr,sr*.25,0,Math.PI,Math.PI*2); ctx.stroke();
@@ -1415,14 +2377,6 @@ function handleMove(e) {
                 if (state.tool==='cube') { bw=bh=Math.max(w,h); cl2=startPos.x<x?startPos.x:startPos.x-bw; ct2=startPos.y<y?startPos.y:startPos.y-bh; }
                 const cr2=cl2+bw,cb2=ct2+bh,ddx=bw*.25,ddy=bh*.25;
                 const fL=cl2,fR=cr2-ddx,fT=ct2+ddy,fB=cb2,bL=cl2+ddx,bR=cr2,bT=ct2,bB=cb2-ddy;
-                if (fc) {
-                    ctx.fillStyle=fc.front;
-                    ctx.beginPath(); ctx.rect(fL,fT,fR-fL,fB-fT); ctx.fill();
-                    ctx.fillStyle=fc.top;
-                    ctx.beginPath(); ctx.moveTo(fL,fT); ctx.lineTo(bL,bT); ctx.lineTo(bR,bT); ctx.lineTo(fR,fT); ctx.closePath(); ctx.fill();
-                    ctx.fillStyle=fc.side;
-                    ctx.beginPath(); ctx.moveTo(fR,fT); ctx.lineTo(bR,bT); ctx.lineTo(bR,bB); ctx.lineTo(fR,fB); ctx.closePath(); ctx.fill();
-                }
                 ctx.setLineDash([]);
                 ctx.beginPath(); ctx.rect(fL,fT,fR-fL,fB-fT);
                 ctx.moveTo(fL,fT); ctx.lineTo(bL,bT); ctx.lineTo(bR,bT); ctx.lineTo(fR,fT);
@@ -1433,14 +2387,6 @@ function handleMove(e) {
             } else if (state.tool==='prism-tri') {
                 const Ax=lf,Ay=tp+h*.2,Bx=rt,By=tp+h*.2,Cx=lf+w/2,Cy=tp;
                 const Axp=Ax,Ayp=bt,Bxp=Bx,Byp=bt,Cxp=Cx,Cyp=bt-h*.2;
-                if (fc) {
-                    ctx.fillStyle=fc.front;
-                    ctx.beginPath(); ctx.moveTo(Ax,Ay); ctx.lineTo(Bx,By); ctx.lineTo(Bxp,Byp); ctx.lineTo(Axp,Ayp); ctx.closePath(); ctx.fill();
-                    ctx.fillStyle=fc.top;
-                    ctx.beginPath(); ctx.moveTo(Ax,Ay); ctx.lineTo(Bx,By); ctx.lineTo(Cx,Cy); ctx.closePath(); ctx.fill();
-                    ctx.fillStyle=fc.side;
-                    ctx.beginPath(); ctx.moveTo(Bx,By); ctx.lineTo(Cx,Cy); ctx.lineTo(Cxp,Cyp); ctx.lineTo(Bxp,Byp); ctx.closePath(); ctx.fill();
-                }
                 ctx.setLineDash([]);
                 ctx.beginPath(); ctx.moveTo(Ax,Ay); ctx.lineTo(Bx,By); ctx.lineTo(Cx,Cy); ctx.closePath();
                 ctx.moveTo(Ax,Ay); ctx.lineTo(Axp,Ayp); ctx.lineTo(Bxp,Byp); ctx.lineTo(Bx,By); ctx.stroke();
@@ -1449,14 +2395,6 @@ function handleMove(e) {
 
             } else if (state.tool==='pyramid-tri') {
                 const Ax=lf,Ay=bt-h*.15,Bx=lf+w*.45,By=bt,Cx=rt,Cy=bt-h*.1,Sx=lf+w*.4,Sy=tp;
-                if (fc) {
-                    ctx.fillStyle=fc.top;
-                    ctx.beginPath(); ctx.moveTo(Sx,Sy); ctx.lineTo(Ax,Ay); ctx.lineTo(Bx,By); ctx.closePath(); ctx.fill();
-                    ctx.fillStyle=fc.front;
-                    ctx.beginPath(); ctx.moveTo(Sx,Sy); ctx.lineTo(Bx,By); ctx.lineTo(Cx,Cy); ctx.closePath(); ctx.fill();
-                    ctx.fillStyle=fc.side;
-                    ctx.beginPath(); ctx.moveTo(Sx,Sy); ctx.lineTo(Ax,Ay); ctx.lineTo(Cx,Cy); ctx.closePath(); ctx.fill();
-                }
                 ctx.setLineDash([]);
                 ctx.beginPath(); ctx.moveTo(Sx,Sy); ctx.lineTo(Ax,Ay); ctx.moveTo(Sx,Sy); ctx.lineTo(Bx,By);
                 ctx.moveTo(Sx,Sy); ctx.lineTo(Cx,Cy); ctx.moveTo(Ax,Ay); ctx.lineTo(Bx,By); ctx.lineTo(Cx,Cy); ctx.stroke();
@@ -1466,14 +2404,6 @@ function handleMove(e) {
             } else if (state.tool==='pyramid-quad') {
                 const Bx=lf,By=bt,Cx=rt-w*.2,Cy=bt,Dx=rt,Dy=bt-h*.25,Ax=lf+w*.2,Ay=bt-h*.25;
                 const Ox=(Bx+Dx)/2,Oy=(By+Dy)/2,Sx=Ox,Sy=tp;
-                if (fc) {
-                    ctx.fillStyle=fc.front;
-                    ctx.beginPath(); ctx.moveTo(Sx,Sy); ctx.lineTo(Bx,By); ctx.lineTo(Cx,Cy); ctx.closePath(); ctx.fill();
-                    ctx.fillStyle=fc.top;
-                    ctx.beginPath(); ctx.moveTo(Sx,Sy); ctx.lineTo(Cx,Cy); ctx.lineTo(Dx,Dy); ctx.closePath(); ctx.fill();
-                    ctx.fillStyle=fc.side;
-                    ctx.beginPath(); ctx.moveTo(Sx,Sy); ctx.lineTo(Dx,Dy); ctx.lineTo(Bx,By); ctx.closePath(); ctx.fill();
-                }
                 ctx.setLineDash([]);
                 ctx.beginPath(); ctx.moveTo(Sx,Sy); ctx.lineTo(Bx,By); ctx.moveTo(Sx,Sy); ctx.lineTo(Cx,Cy);
                 ctx.moveTo(Sx,Sy); ctx.lineTo(Dx,Dy); ctx.moveTo(Bx,By); ctx.lineTo(Cx,Cy); ctx.lineTo(Dx,Dy); ctx.stroke();
@@ -1485,19 +2415,6 @@ function handleMove(e) {
 
             } else if (state.tool==='cylinder') {
                 const rx=w/2,ry=h*.12,ccx=lf+rx,tCy=tp+ry,bCy=bt-ry;
-                if (fc) {
-                    const [rr,gg,bb]=fc.rgb;
-                    const grd=ctx.createLinearGradient(lf,0,rt,0);
-                    grd.addColorStop(0,   `rgba(${Math.max(0,rr-65)},${Math.max(0,gg-65)},${Math.max(0,bb-65)},.78)`);
-                    grd.addColorStop(0.3, `rgba(${Math.min(255,rr+90)},${Math.min(255,gg+90)},${Math.min(255,bb+90)},.88)`);
-                    grd.addColorStop(0.65,`rgba(${rr},${gg},${bb},.72)`);
-                    grd.addColorStop(1,   `rgba(${Math.max(0,rr-70)},${Math.max(0,gg-70)},${Math.max(0,bb-70)},.78)`);
-                    ctx.fillStyle=grd; ctx.fillRect(lf,tCy,w,bCy-tCy);
-                    ctx.fillStyle=fc.front;
-                    ctx.beginPath(); ctx.ellipse(ccx,bCy,rx,ry,0,0,Math.PI*2); ctx.fill();
-                    ctx.fillStyle=fc.ellipTop;
-                    ctx.beginPath(); ctx.ellipse(ccx,tCy,rx,ry,0,0,Math.PI*2); ctx.fill();
-                }
                 ctx.setLineDash([]);
                 ctx.beginPath(); ctx.ellipse(ccx,tCy,rx,ry,0,0,Math.PI*2);
                 ctx.moveTo(lf,tCy); ctx.lineTo(lf,bCy); ctx.moveTo(rt,tCy); ctx.lineTo(rt,bCy);
@@ -1506,19 +2423,6 @@ function handleMove(e) {
 
             } else if (state.tool==='cone') {
                 const rx=w/2,ry=h*.12,ccx=lf+rx,bCy=bt-ry;
-                if (fc) {
-                    const [rr,gg,bb]=fc.rgb;
-                    ctx.fillStyle=fc.front;
-                    ctx.beginPath(); ctx.moveTo(ccx,tp); ctx.lineTo(lf,bCy); ctx.lineTo(rt,bCy); ctx.closePath(); ctx.fill();
-                    const grd=ctx.createLinearGradient(lf,0,rt,0);
-                    grd.addColorStop(0,`rgba(${Math.max(0,rr-60)},${Math.max(0,gg-60)},${Math.max(0,bb-60)},.42)`);
-                    grd.addColorStop(.38,`rgba(${Math.min(255,rr+90)},${Math.min(255,gg+90)},${Math.min(255,bb+90)},.28)`);
-                    grd.addColorStop(1,`rgba(${Math.max(0,rr-60)},${Math.max(0,gg-60)},${Math.max(0,bb-60)},.48)`);
-                    ctx.fillStyle=grd;
-                    ctx.beginPath(); ctx.moveTo(ccx,tp); ctx.lineTo(lf,bCy); ctx.lineTo(rt,bCy); ctx.closePath(); ctx.fill();
-                    ctx.fillStyle=fc.side;
-                    ctx.beginPath(); ctx.ellipse(ccx,bCy,rx,ry,0,0,Math.PI*2); ctx.fill();
-                }
                 ctx.setLineDash([]);
                 ctx.beginPath(); ctx.moveTo(ccx,tp); ctx.lineTo(lf,bCy); ctx.moveTo(ccx,tp); ctx.lineTo(rt,bCy);
                 ctx.ellipse(ccx,bCy,rx,ry,0,0,Math.PI); ctx.stroke();
@@ -1531,11 +2435,240 @@ function handleMove(e) {
 }
 
 /* ─────────────────────────────────────────────
+   DRAW PEN SEGMENT  (non-ballpoint pen types)
+───────────────────────────────────────────── */
+function drawPenSegment(x2, y2) {
+    const x1 = prevPenX ?? x2;
+    const y1 = prevPenY ?? y2;
+    const lw = state.lineWidth;
+    const col = state.color;
+    const dx = x2 - x1, dy = y2 - y1;
+    const dist = Math.sqrt(dx*dx + dy*dy) || 0.001;
+
+    ctx.save();
+
+    switch (state.penType) {
+
+        case 'pencil': {
+            // Textured pencil: thin strokes with slight opacity noise
+            ctx.globalAlpha = 0.55 + Math.random() * 0.18;
+            ctx.strokeStyle = col;
+            ctx.lineWidth = Math.max(1, lw * 0.55);
+            ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+            // Second texture line slightly offset
+            const offX = (Math.random() - 0.5) * lw * 0.45;
+            const offY = (Math.random() - 0.5) * lw * 0.45;
+            ctx.globalAlpha = 0.18 + Math.random() * 0.15;
+            ctx.lineWidth = Math.max(0.5, lw * 0.28);
+            ctx.beginPath(); ctx.moveTo(x1 + offX, y1 + offY); ctx.lineTo(x2 + offX, y2 + offY); ctx.stroke();
+            break;
+        }
+
+        case 'fountain': {
+            // Speed-based width: fast → thin, slow → thick
+            const speed = dist;
+            const w = lw * Math.max(0.35, Math.min(2.4, 2.6 - speed * 0.055));
+            ctx.strokeStyle = col;
+            ctx.lineWidth = w;
+            ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            ctx.globalAlpha = 0.92;
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+            break;
+        }
+
+        case 'calligraphy': {
+            // Angle-sensitive width: thick on diagonal, thin on perpendicular
+            const angle = Math.atan2(dy, dx);
+            const nibAngle = -Math.PI / 4;  // 45° nib
+            const t = Math.abs(Math.sin(angle - nibAngle));
+            const minW = Math.max(1, lw * 0.18);
+            const maxW = lw * 2.8;
+            const w = minW + (maxW - minW) * t;
+            const perpX = Math.sin(angle) * w / 2;
+            const perpY = -Math.cos(angle) * w / 2;
+
+            ctx.fillStyle = col;
+            ctx.globalAlpha = 0.93;
+            // Draw filled quadrilateral for the stroke body
+            ctx.beginPath();
+            ctx.moveTo(x1 - perpX, y1 - perpY);
+            ctx.lineTo(x2 - perpX, y2 - perpY);
+            ctx.lineTo(x2 + perpX, y2 + perpY);
+            ctx.lineTo(x1 + perpX, y1 + perpY);
+            ctx.closePath(); ctx.fill();
+            // Round end caps
+            ctx.beginPath(); ctx.arc(x2, y2, w / 2, 0, Math.PI * 2); ctx.fill();
+            break;
+        }
+
+        case 'brush': {
+            // Soft brush: thick center + translucent wide halo
+            const brushW = lw * 2.4;
+            const haloW  = lw * 6.0;
+            // Halo pass
+            ctx.strokeStyle = col;
+            ctx.lineWidth = haloW;
+            ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            ctx.globalAlpha = 0.07;
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+            // Core pass
+            ctx.lineWidth = brushW;
+            ctx.globalAlpha = 0.72;
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+            break;
+        }
+
+        case 'marker': {
+            // Thick flat marker: square cap, slightly transparent
+            ctx.strokeStyle = col;
+            ctx.lineWidth = lw * 3.0;
+            ctx.lineCap = 'square'; ctx.lineJoin = 'round';
+            ctx.globalAlpha = 0.88;
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+            break;
+        }
+
+        default: {
+            // Fallback: plain line
+            ctx.strokeStyle = col; ctx.lineWidth = lw;
+            ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+            break;
+        }
+    }
+
+    ctx.restore();
+}
+
+/* ─────────────────────────────────────────────
+   POLYGON FILL  (tô màu đa giác)
+───────────────────────────────────────────── */
+function commitPolyFill() {
+    const pts = state.polyPoints;
+    tmpCtx.clearRect(0, 0, tmpCanvas.width, tmpCanvas.height);
+
+    if (pts.length < 3) {
+        // Not enough vertices — abort silently
+        abortPolyFill();
+        return;
+    }
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.setLineDash([]);
+
+    // Build polygon path once
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+    ctx.closePath();
+
+    // ── Light fill (25% opacity) ────────────────
+    ctx.fillStyle   = state.color;
+    ctx.globalAlpha = 0.25;
+    ctx.fill();
+
+    // ── Solid outline ───────────────────────────
+    ctx.globalAlpha  = 1;
+    ctx.strokeStyle  = state.color;
+    ctx.lineWidth    = state.lineWidth;
+    ctx.lineCap      = 'round';
+    ctx.lineJoin     = 'round';
+    ctx.stroke();
+
+    ctx.restore();
+
+    state.polyPoints  = [];
+    polyCanvasSnap    = null;
+    saveState();
+    updateUI();
+}
+
+function abortPolyFill() {
+    if (state.polyPoints.length > 0 && polyCanvasSnap) {
+        ctx.putImageData(polyCanvasSnap, 0, 0);
+    }
+    state.polyPoints = [];
+    polyCanvasSnap   = null;
+    tmpCtx.clearRect(0, 0, tmpCanvas.width, tmpCanvas.height);
+    updateUI();
+}
+
+/* ─────────────────────────────────────────────
+   SNAP-TO-LINE  (nhận dạng đoạn thẳng)
+───────────────────────────────────────────── */
+let _snapTimer = null;
+function showSnapToast() {
+    const t = document.getElementById('snap-toast');
+    if (!t) return;
+    clearTimeout(_snapTimer);
+    t.classList.add('show');
+    _snapTimer = setTimeout(() => t.classList.remove('show'), 1400);
+}
+
+function trySnapToLine() {
+    // Need at least 8 sampled points and a meaningful stroke length
+    if (penPoints.length < 8) return false;
+
+    const p0 = penPoints[0];
+    const pN = penPoints[penPoints.length - 1];
+    const straightLen = Math.hypot(pN.x - p0.x, pN.y - p0.y);
+
+    // Too short to snap, or stroke barely moved (tap/dot)
+    if (straightLen < 36) return false;
+
+    // If the path travelled is > 1.4× the straight-line distance → too curvy
+    if (penPathLen > straightLen * 1.40) return false;
+
+    // Calculate max & average perpendicular deviation from the ideal line p0→pN
+    const dxL = pN.x - p0.x, dyL = pN.y - p0.y;
+    const lineLen = straightLen;
+    let maxDev = 0, sumDev = 0;
+    for (const p of penPoints) {
+        const dev = Math.abs(dyL * p.x - dxL * p.y + pN.x * p0.y - pN.y * p0.x) / lineLen;
+        if (dev > maxDev) maxDev = dev;
+        sumDev += dev;
+    }
+    const avgDev = sumDev / penPoints.length;
+
+    // Adaptive threshold: stricter on short lines, looser on very long ones
+    const maxAllowed = Math.min(22, Math.max(8, straightLen * 0.055));
+    const avgAllowed = maxAllowed * 0.5;
+
+    if (maxDev > maxAllowed || avgDev > avgAllowed) return false;
+
+    // ── Snap! Redraw as perfect straight line ──────────────────
+    ctx.putImageData(savedData, 0, 0);
+
+    if (state.penType === 'ballpoint') {
+        applyStroke(() => { ctx.moveTo(p0.x, p0.y); ctx.lineTo(pN.x, pN.y); });
+    } else {
+        // Interpolate segments so the pen-type rendering is preserved
+        const steps = Math.max(4, Math.round(straightLen / 3));
+        prevPenX = p0.x; prevPenY = p0.y;
+        for (let i = 1; i <= steps; i++) {
+            const t = i / steps;
+            const sx = p0.x + (pN.x - p0.x) * t;
+            const sy = p0.y + (pN.y - p0.y) * t;
+            drawPenSegment(sx, sy);
+            prevPenX = sx; prevPenY = sy;
+        }
+        prevPenX = null; prevPenY = null;
+    }
+
+    saveState();
+    showSnapToast();
+    return true;
+}
+
+/* ─────────────────────────────────────────────
    HANDLE END
 ───────────────────────────────────────────── */
 function handleEnd(e) {
     if (!state.isDrawing) return;
     state.isDrawing = false;
+    prevPenX = null; prevPenY = null;
     ctx.closePath(); ctx.globalCompositeOperation='source-over';
 
     if (state.tool==='curve') {
@@ -1555,6 +2688,10 @@ function handleEnd(e) {
         }
         return;
     }
+    // Try snap-to-line for pen strokes
+    if (state.tool === 'pen' && state.snapLines) {
+        if (trySnapToLine()) return; // saveState already called inside
+    }
     saveState();
 }
 
@@ -1573,11 +2710,13 @@ window.addEventListener('touchcancel',handleEnd);
 window.addEventListener('keydown', e => {
     if ((e.ctrlKey||e.metaKey) && e.key==='z') { e.preventDefault(); undo(); }
     if ((e.ctrlKey||e.metaKey) && e.key==='y') { e.preventDefault(); redo(); }
-    if (e.key==='Escape') { commitCurve(); commitArc(); closeAllPanels(); }
+    if (e.key==='Escape') { commitCurve(); commitArc(); abortPolyFill(); closeAllPanels(); }
     // Quick-access
-    const km = {p:'pen',e:'eraser',t:'text',h:'highlight'};
+    const km = {p:'pen',e:'eraser',t:'text',h:'highlight',m:'model-select',f:'poly-fill'};
     if (!e.ctrlKey && !e.metaKey && km[e.key]) {
-        commitCurve(); state.tool=km[e.key]; closeAllPanels(); updateUI();
+        commitCurve(); commitArc(); abortPolyFill();
+        state.tool = (state.tool === km[e.key] && e.key==='m') ? 'pen' : km[e.key];
+        closeAllPanels(); updateUI();
     }
 });
 
