@@ -7,6 +7,154 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
 /* ══════════════════════════════════════════════════════
+   LOGIN OVERLAY
+══════════════════════════════════════════════════════ */
+#login-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 45%, #0f2d1a 100%);
+    transition: opacity .55s ease, visibility .55s ease;
+}
+#login-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+/* Animated background circles */
+#login-overlay::before {
+    content: '';
+    position: absolute; inset: 0; overflow: hidden;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(99,102,241,.18) 0%, transparent 45%),
+        radial-gradient(circle at 80% 70%, rgba(16,185,129,.14) 0%, transparent 45%),
+        radial-gradient(circle at 55% 10%, rgba(245,158,11,.10) 0%, transparent 35%);
+    animation: loginBgPulse 6s ease-in-out infinite alternate;
+}
+@keyframes loginBgPulse {
+    from { opacity: .7; }
+    to   { opacity: 1; }
+}
+
+.login-card {
+    position: relative; z-index: 1;
+    background: rgba(15, 23, 42, .82);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 24px;
+    padding: 44px 48px 40px;
+    width: min(420px, 92vw);
+    box-shadow: 0 32px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04);
+    text-align: center;
+    animation: loginCardIn .6s cubic-bezier(.22,.68,0,1.2) both;
+}
+@keyframes loginCardIn {
+    from { opacity: 0; transform: translateY(28px) scale(.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Decorative top line */
+.login-card::before {
+    content: '';
+    position: absolute; top: 0; left: 10%; right: 10%; height: 2px;
+    background: linear-gradient(90deg, transparent, #6366f1, #10b981, transparent);
+    border-radius: 2px;
+}
+
+.login-avatar {
+    width: 76px; height: 76px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #10b981);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 34px;
+    box-shadow: 0 4px 24px rgba(99,102,241,.45);
+    animation: avatarFloat 3.5s ease-in-out infinite;
+}
+@keyframes avatarFloat {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-6px); }
+}
+
+.login-appname {
+    font-size: 11px; font-weight: 700; letter-spacing: 3px;
+    color: #6366f1; text-transform: uppercase; margin-bottom: 6px;
+}
+.login-title {
+    font-size: 22px; font-weight: 800; color: #f1f5f9;
+    line-height: 1.2; margin-bottom: 4px;
+}
+.login-school {
+    font-size: 12.5px; color: #94a3b8; line-height: 1.5; margin-bottom: 28px;
+}
+.login-school strong { color: #34d399; font-weight: 600; }
+
+.login-divider {
+    border: none; border-top: 1px solid rgba(255,255,255,.07);
+    margin: 0 0 26px;
+}
+
+.login-label {
+    display: block; text-align: left;
+    font-size: 11px; font-weight: 600; letter-spacing: 1px;
+    color: #64748b; text-transform: uppercase; margin-bottom: 8px;
+}
+.login-input-wrap { position: relative; margin-bottom: 18px; }
+.login-input {
+    width: 100%; padding: 13px 46px 13px 16px;
+    background: rgba(255,255,255,.06);
+    border: 1.5px solid rgba(255,255,255,.10);
+    border-radius: 12px;
+    color: #f1f5f9; font-size: 15px; font-family: inherit;
+    outline: none; transition: border-color .2s, background .2s;
+    letter-spacing: 2px;
+}
+.login-input::placeholder { letter-spacing: 1px; color: #475569; }
+.login-input:focus {
+    border-color: #6366f1;
+    background: rgba(99,102,241,.08);
+}
+.login-input.error { border-color: #ef4444; background: rgba(239,68,68,.07); }
+.login-eye {
+    position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer;
+    color: #475569; font-size: 17px; line-height: 1;
+    transition: color .15s;
+}
+.login-eye:hover { color: #94a3b8; }
+
+.login-btn {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    border: none; border-radius: 12px;
+    color: #fff; font-size: 15px; font-weight: 700;
+    cursor: pointer; letter-spacing: .5px;
+    transition: transform .15s, box-shadow .15s, opacity .15s;
+    box-shadow: 0 4px 18px rgba(99,102,241,.45);
+}
+.login-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 26px rgba(99,102,241,.55); }
+.login-btn:active { transform: translateY(0); }
+
+.login-err {
+    margin-top: 12px; font-size: 13px; color: #f87171;
+    min-height: 18px; transition: opacity .2s;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.login-err.hidden { opacity: 0; }
+
+.login-footer {
+    margin-top: 28px; font-size: 10.5px; color: #334155;
+    line-height: 1.6;
+}
+.login-footer span { color: #475569; }
+
+/* Shake animation on wrong password */
+@keyframes loginShake {
+    0%,100% { transform: translateX(0); }
+    20%      { transform: translateX(-8px); }
+    40%      { transform: translateX(8px); }
+    60%      { transform: translateX(-5px); }
+    80%      { transform: translateX(5px); }
+}
+.login-card.shake { animation: loginShake .4s ease; }
+
+/* ══════════════════════════════════════════════════════
    RESET & BASE
 ══════════════════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -817,6 +965,41 @@ canvas { touch-action: none; -ms-touch-action: none; }
 </style>
 </head>
 <body>
+
+<!-- ═══════════════════  LOGIN OVERLAY  ═══════════════════ -->
+<div id="login-overlay">
+    <div class="login-card" id="login-card">
+        <!-- Top rainbow line via ::before -->
+        <div class="login-avatar">✏️</div>
+
+        <div class="login-appname">Bảng Vẽ Hình Học</div>
+        <h1 class="login-title">Thầy Vũ Tiến Lực</h1>
+        <p class="login-school">
+            <strong>Trường THPT Nguyễn Hữu Cảnh</strong><br>
+            Thành phố Hồ Chí Minh
+        </p>
+
+        <hr class="login-divider">
+
+        <label class="login-label" for="login-pw">🔑 Nhập mật khẩu để vào bảng</label>
+        <div class="login-input-wrap">
+            <input id="login-pw" class="login-input" type="password"
+                   placeholder="Mật khẩu…" autocomplete="off" spellcheck="false">
+            <button class="login-eye" id="login-eye-btn" tabindex="-1" title="Hiện/ẩn mật khẩu">👁</button>
+        </div>
+        <button class="login-btn" id="login-submit-btn">Vào bảng vẽ →</button>
+
+        <div class="login-err hidden" id="login-err">
+            ❌ Mật khẩu không đúng, vui lòng thử lại
+        </div>
+
+        <div class="login-footer">
+            <span>Bảng vẽ hình học tương tác · Hỗ trợ bảng Wacom</span><br>
+            <span>© 2025 Vũ Tiến Lực · THPT Nguyễn Hữu Cảnh · TP.HCM</span>
+        </div>
+    </div>
+</div>
+
 
 <!-- ═══════════════════════  SIDEBAR  ═══════════════════════ -->
 <aside id="sidebar">
@@ -2979,6 +3162,70 @@ window.addEventListener('keydown', e => {
         closeAllPanels(); updateUI();
     }
 });
+
+/* ─────────────────────────────────────────────
+   LOGIN  (mật khẩu bảo vệ bảng vẽ)
+───────────────────────────────────────────── */
+(function initLogin() {
+    const PASS_HASH = btoa('ThanhHoa');   // base-64, không lưu plain-text
+    const SK = 'bangve_auth_v1';
+    const overlay  = document.getElementById('login-overlay');
+    const card     = document.getElementById('login-card');
+    const pwInput  = document.getElementById('login-pw');
+    const submitBtn= document.getElementById('login-submit-btn');
+    const errMsg   = document.getElementById('login-err');
+    const eyeBtn   = document.getElementById('login-eye-btn');
+
+    function unlock() {
+        overlay.classList.add('hidden');
+        sessionStorage.setItem(SK, '1');
+        // Focus canvas sau khi đăng nhập
+        setTimeout(() => canvas.focus && canvas.focus(), 600);
+    }
+
+    // Đã xác thực trong phiên này → bỏ qua login
+    if (sessionStorage.getItem(SK) === '1') {
+        overlay.classList.add('hidden');
+        return;
+    }
+
+    // Hiển thị overlay, focus ô mật khẩu sau khi animation xong
+    setTimeout(() => pwInput.focus(), 700);
+
+    function tryLogin() {
+        const val = pwInput.value.trim();
+        if (btoa(val) === PASS_HASH) {
+            errMsg.classList.add('hidden');
+            pwInput.classList.remove('error');
+            // Hiệu ứng button thành công
+            submitBtn.textContent = '✓ Đúng rồi! Đang vào…';
+            submitBtn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
+            setTimeout(unlock, 700);
+        } else {
+            pwInput.classList.add('error');
+            errMsg.classList.remove('hidden');
+            // Lắc thẻ
+            card.classList.remove('shake');
+            void card.offsetWidth; // reflow
+            card.classList.add('shake');
+            pwInput.select();
+            setTimeout(() => pwInput.classList.remove('error'), 1800);
+        }
+    }
+
+    submitBtn.addEventListener('click', tryLogin);
+    pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+
+    // Toggle hiện/ẩn mật khẩu
+    eyeBtn.addEventListener('click', () => {
+        if (pwInput.type === 'password') {
+            pwInput.type = 'text'; eyeBtn.textContent = '🙈';
+        } else {
+            pwInput.type = 'password'; eyeBtn.textContent = '👁';
+        }
+        pwInput.focus();
+    });
+})();
 
 /* ─────────────────────────────────────────────
    INIT
