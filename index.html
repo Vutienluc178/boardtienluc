@@ -1051,7 +1051,7 @@ canvas { touch-action: none; -ms-touch-action: none; }
     </div>
 
     <!-- Polygon fill button -->
-    <button class="tb-full" id="btn-poly-fill" data-tip="Tô màu đa giác – chấm các đỉnh, click điểm đầu hoặc double-click để đóng (F)" style="margin-bottom:3px">
+    <button class="tb-full" id="btn-poly-fill" data-tip="Tô màu đa giác – chấm các đỉnh, click điểm đầu hoặc double-click để đóng (G)" style="margin-bottom:3px">
         <i data-lucide="pentagon"></i> Đa giác
         <span id="poly-pt-badge" style="display:none">0</span>
     </button>
@@ -1129,7 +1129,7 @@ canvas { touch-action: none; -ms-touch-action: none; }
     <button class="tb-full" id="btn-reset-pts" data-tip="Reset nhãn điểm về A" style="margin-top:3px">
         <i data-lucide="refresh-ccw"></i> Reset A,B,C
     </button>
-    <button class="tb-full" id="btn-fullscreen" data-tip="Toàn màn hình (F11)" style="margin-top:3px">
+    <button class="tb-full" id="btn-fullscreen" data-tip="Toàn màn hình (F hoặc F11)" style="margin-top:3px">
         <i data-lucide="maximize"></i> Toàn màn
     </button>
 
@@ -1334,7 +1334,7 @@ const ALL_SHAPES = [...SHAPES_3D, ...SHAPES_2D];
 const state = {
     tool: 'pen',
     color: '#1e1e8a',
-    lineWidth: 4,
+    lineWidth: 2,
     background: 'grid',
     isDrawing: false,
     curveStage: 0,
@@ -1342,7 +1342,7 @@ const state = {
     stampChar: '✓',
     pointLabelIndex: 0,
     spotlight: false,
-    penType: 'ballpoint',
+    penType: 'calligraphy',
     snapLines: true,
     polyPoints: [],
     // angle-arc: 3-point state
@@ -3154,8 +3154,16 @@ window.addEventListener('keydown', e => {
     if ((e.ctrlKey||e.metaKey) && e.key==='z') { e.preventDefault(); undo(); }
     if ((e.ctrlKey||e.metaKey) && e.key==='y') { e.preventDefault(); redo(); }
     if (e.key==='Escape') { commitCurve(); commitArc(); abortPolyFill(); closeAllPanels(); }
-    // Quick-access
-    const km = {p:'pen',e:'eraser',t:'text',h:'highlight',m:'model-select',f:'poly-fill'};
+
+    // F = Fullscreen toggle (gọi cùng nút btnFS để đồng bộ icon)
+    if (!e.ctrlKey && !e.metaKey && e.key === 'f') {
+        e.preventDefault();
+        document.getElementById('btn-fullscreen') && document.getElementById('btn-fullscreen').click();
+        return;
+    }
+
+    // Quick-access tool keys  (g = đa giác tô màu, thay cho f cũ)
+    const km = {p:'pen', e:'eraser', t:'text', h:'highlight', m:'model-select', g:'poly-fill'};
     if (!e.ctrlKey && !e.metaKey && km[e.key]) {
         commitCurve(); commitArc(); abortPolyFill();
         state.tool = (state.tool === km[e.key] && e.key==='m') ? 'pen' : km[e.key];
