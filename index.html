@@ -219,6 +219,25 @@ window.MathJax = {
 /* MathJax inherits font size */
 #q-text mjx-container { font-size: inherit !important; }
 
+/* "Câu X." label */
+#q-text .q-label {
+    color: #4f46e5;
+    font-weight: 900;
+    font-style: normal;
+    margin-right: 4px;
+    text-shadow:
+        0 0 16px rgba(255,255,255,1),
+        0 0 32px rgba(255,255,255,.9),
+        2px  2px 0 rgba(255,255,255,.7),
+       -2px -2px 0 rgba(255,255,255,.7);
+}
+#q-bar.dark-board #q-text .q-label {
+    color: #a5b4fc;
+    text-shadow:
+        0 0 12px rgba(0,0,0,1),
+        2px 2px 0 rgba(0,0,0,.8);
+}
+
 /* ── Control pill — pinned bottom-right of bar area ── */
 #q-controls {
     align-self: flex-start;
@@ -780,6 +799,7 @@ html, body {
     border-radius: 16px;
     padding: 14px 12px;
     width: 310px;
+    max-height: 92vh; overflow-y: auto;
     display: none; z-index: 160;
     box-shadow: 0 20px 56px rgba(0,0,0,.6);
 }
@@ -1226,6 +1246,13 @@ canvas { touch-action: none; -ms-touch-action: none; }
     <div class="s-grid">
         <button class="tb" data-tool="right-angle"  data-tip="Dấu góc vuông ∟"><i data-lucide="corner-down-right"></i></button>
         <button class="tb" data-tool="angle-arc"    data-tip="Cung góc (3 điểm)"><i data-lucide="diameter"></i></button>
+        <button class="tb acc-blue" data-tool="protractor" data-tip="Thước đo góc thông minh — Click đỉnh → cạnh 1 → cạnh 2">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 21 L12 3 L21 21 Z"/>
+                <path d="M7.5 14 A6 6 0 0 1 16.5 14"/>
+                <text x="12" y="18.5" text-anchor="middle" font-size="5" fill="currentColor" stroke="none" font-weight="bold">°</text>
+            </svg>
+        </button>
         <button class="tb" id="btn-ptlabel" data-tool="point-label" data-tip="Điểm có nhãn A,B,C...">
             <i data-lucide="map-pin"></i>
             <span id="pt-badge">A</span>
@@ -1451,10 +1478,16 @@ canvas { touch-action: none; -ms-touch-action: none; }
         </div>
         <div class="pt-card" data-pen="fountain">
             <svg viewBox="0 0 80 36" class="pt-preview">
-                <path d="M8 28 Q25 22 40 18 Q55 14 72 28" stroke="#6366f1" stroke-width="3.8" fill="none" stroke-linecap="round" opacity="0.85"/>
-                <path d="M8 28 Q25 22 40 18" stroke="#a5b4fc" stroke-width="1" fill="none" stroke-linecap="round"/>
+                <!-- nét dọc đậm -->
+                <line x1="15" y1="8" x2="15" y2="28" stroke="#4f46e5" stroke-width="7" stroke-linecap="butt" opacity="0.9"/>
+                <!-- nét ngang mảnh -->
+                <line x1="10" y1="18" x2="36" y2="18" stroke="#4f46e5" stroke-width="0.8" stroke-linecap="butt" opacity="0.9"/>
+                <!-- chữ O thu nhỏ minh họa -->
+                <ellipse cx="56" cy="18" rx="11" ry="9" stroke="#4f46e5" stroke-width="0.8" fill="none" opacity="0.7"/>
+                <ellipse cx="56" cy="18" rx="8" ry="12" stroke="#4f46e5" stroke-width="6.5" fill="none"
+                         stroke-dasharray="13 100" stroke-dashoffset="-3" opacity="0.85"/>
             </svg>
-            <div class="pt-card-name">Bút mực</div>
+            <div class="pt-card-name">Bút mài</div>
         </div>
         <div class="pt-card" data-pen="calligraphy">
             <svg viewBox="0 0 80 36" class="pt-preview">
@@ -1476,6 +1509,29 @@ canvas { touch-action: none; -ms-touch-action: none; }
                 <path d="M8 27 Q40 10 72 27" stroke="#6366f1" stroke-width="7" fill="none" stroke-linecap="square" opacity="0.88"/>
             </svg>
             <div class="pt-card-name">Bút dạ</div>
+        </div>
+        <div class="pt-card" data-pen="copperplate">
+            <svg viewBox="0 0 80 36" class="pt-preview">
+                <!-- downstroke (thick) + upstroke (hairline) minh hoạ copperplate -->
+                <line x1="22" y1="7" x2="14" y2="29" stroke="#6366f1" stroke-width="6.5" stroke-linecap="round" opacity="0.9"/>
+                <line x1="22" y1="7" x2="32" y2="29" stroke="#6366f1" stroke-width="0.7" stroke-linecap="round" opacity="0.85"/>
+                <!-- oval O -->
+                <ellipse cx="56" cy="18" rx="12" ry="10" stroke="#6366f1" stroke-width="5.5" fill="none"
+                    stroke-dasharray="12 28" stroke-dashoffset="0" opacity="0.88" stroke-linecap="round"/>
+                <ellipse cx="56" cy="18" rx="12" ry="10" stroke="#6366f1" stroke-width="0.7" fill="none"
+                    stroke-dasharray="28 12" stroke-dashoffset="-12" opacity="0.8"/>
+            </svg>
+            <div class="pt-card-name">Ngòi mềm</div>
+        </div>
+        <div class="pt-card" data-pen="italic">
+            <svg viewBox="0 0 80 36" class="pt-preview">
+                <!-- nét ngang đậm, nét dọc mảnh — italic nib -->
+                <line x1="10" y1="14" x2="70" y2="14" stroke="#818cf8" stroke-width="7" stroke-linecap="butt" opacity="0.88"/>
+                <line x1="10" y1="26" x2="70" y2="26" stroke="#818cf8" stroke-width="7" stroke-linecap="butt" opacity="0.88"/>
+                <line x1="22" y1="9"  x2="14" y2="31" stroke="#818cf8" stroke-width="0.7" stroke-linecap="round" opacity="0.85"/>
+                <line x1="58" y1="9"  x2="66" y2="31" stroke="#818cf8" stroke-width="0.7" stroke-linecap="round" opacity="0.85"/>
+            </svg>
+            <div class="pt-card-name">Ngòi nghiêng</div>
         </div>
     </div>
     <div style="margin-top:8px;font-size:9px;color:rgba(100,116,139,.5);text-align:center">
@@ -1577,6 +1633,8 @@ const state = {
     polyPoints: [],
     // angle-arc: 3-point state
     arcStage: 0, arcVertex: null, arcP1: null,
+    // protractor: thước đo độ thông minh
+    protractorStage: 0, protractorO: null, protractorA: null,
 };
 
 // Point-label editable input state
@@ -1720,7 +1778,7 @@ function updateUI() {
     if (isModelSelect) canvas.style.pointerEvents = 'none';
     else canvas.style.pointerEvents = '';
     // Pen type badge label + card active states
-    const penLabels = { ballpoint:'bi', pencil:'chì', fountain:'mực', calligraphy:'tp', brush:'lông', marker:'dạ' };
+    const penLabels = { ballpoint:'bi', pencil:'chì', fountain:'mài', calligraphy:'tp', brush:'lông', marker:'dạ', copperplate:'cp', italic:'it' };
     const badge = document.getElementById('pen-type-badge');
     if (badge) badge.textContent = penLabels[state.penType] || 'bi';
     document.querySelectorAll('.pt-card').forEach(c => c.classList.toggle('active', c.dataset.pen === state.penType));
@@ -1745,10 +1803,11 @@ function updateUI() {
    HELPER: commit dangling curve
 ───────────────────────────────────────────── */
 function commitCurve() {
-    if (state.tool === 'curve' && state.curveStage === 2) {
-        ctx.putImageData(savedData, 0, 0);
-        applyStroke(() => { ctx.moveTo(curveStart.x,curveStart.y); ctx.lineTo(curveEnd.x,curveEnd.y); });
-        saveState(); state.curveStage = 0;
+    // Huỷ mọi giai đoạn đường cong dở dang, khôi phục canvas ban đầu
+    if (state.tool === 'curve' && state.curveStage > 0) {
+        state.curveStage = 0;
+        tmpCtx.clearRect(0, 0, tmpCanvas.width, tmpCanvas.height);
+        if (savedData) { ctx.putImageData(savedData, 0, 0); savedData = null; }
     }
 }
 function commitArc() {
@@ -1756,6 +1815,214 @@ function commitArc() {
         state.arcStage = 0; state.arcVertex = state.arcP1 = null;
         tmpCtx.clearRect(0,0,tmpCanvas.width,tmpCanvas.height);
     }
+}
+function abortProtractor() {
+    if (state.protractorStage > 0) {
+        state.protractorStage = 0; state.protractorO = state.protractorA = null;
+        tmpCtx.clearRect(0,0,tmpCanvas.width,tmpCanvas.height);
+    }
+}
+
+/* ── Thước đo góc thông minh ── */
+
+/* Tính góc (diff chuẩn hóa về [-π,π]) giữa OA và OB */
+function _protractorAngle(O, A, B) {
+    const a1 = Math.atan2(A.y - O.y, A.x - O.x);
+    const a2 = Math.atan2(B.y - O.y, B.x - O.x);
+    let diff = a2 - a1;
+    while (diff >  Math.PI) diff -= 2*Math.PI;
+    while (diff < -Math.PI) diff += 2*Math.PI;
+    return { a1, a2, diff, deg: Math.round(Math.abs(diff) * 180 / Math.PI * 10) / 10 };
+}
+
+/* Snap điểm B thô về bội số 5° so với cạnh OA */
+function _snapProtractorB(O, A, rawX, rawY) {
+    const a1 = Math.atan2(A.y - O.y, A.x - O.x);
+    const rawA2 = Math.atan2(rawY - O.y, rawX - O.x);
+    let rawDiff = rawA2 - a1;
+    while (rawDiff >  Math.PI) rawDiff -= 2*Math.PI;
+    while (rawDiff < -Math.PI) rawDiff += 2*Math.PI;
+    const sign = rawDiff >= 0 ? 1 : -1;
+    const absDeg = Math.abs(rawDiff * 180 / Math.PI);
+    // Snap to nearest 5°, clamp [0, 180]
+    const snappedAbsDeg = Math.min(180, Math.max(0, Math.round(absDeg / 5) * 5));
+    const snappedDiff   = sign * snappedAbsDeg * Math.PI / 180;
+    const dist = Math.max(1, Math.hypot(rawX - O.x, rawY - O.y));
+    const snappedA2 = a1 + snappedDiff;
+    return {
+        x: O.x + dist * Math.cos(snappedA2),
+        y: O.y + dist * Math.sin(snappedA2),
+        deg: snappedAbsDeg, diff: snappedDiff, a1, a2: snappedA2
+    };
+}
+
+/* Vẽ ký hiệu góc vuông ∟ tại đỉnh O, giữa 2 hướng a1 và a2 */
+function _drawRightAngleMark(c, O, a1, a2, r) {
+    const sz = Math.max(10, Math.min(22, r * 0.85));
+    const p1x = O.x + sz * Math.cos(a1), p1y = O.y + sz * Math.sin(a1);
+    const p2x = p1x  + sz * Math.cos(a2), p2y = p1y  + sz * Math.sin(a2);
+    const p3x = O.x + sz * Math.cos(a2), p3y = O.y + sz * Math.sin(a2);
+    c.beginPath();
+    c.moveTo(p1x, p1y); c.lineTo(p2x, p2y); c.lineTo(p3x, p3y);
+    c.stroke();
+}
+
+/* Vẽ nhãn độ trong pill bo góc */
+function _drawDegreePill(c, txt, lx, ly, col, fontSize) {
+    c.font = `bold ${fontSize}px system-ui,sans-serif`;
+    c.textAlign = 'center'; c.textBaseline = 'middle';
+    const tw = c.measureText(txt).width;
+    const pr = 5, ph = fontSize * 0.65;
+    c.fillStyle = 'rgba(255,255,255,0.93)';
+    c.beginPath(); c.roundRect(lx-tw/2-pr, ly-ph, tw+pr*2, ph*2, 6); c.fill();
+    c.strokeStyle = col; c.lineWidth = 1.3;
+    c.beginPath(); c.roundRect(lx-tw/2-pr, ly-ph, tw+pr*2, ph*2, 6); c.stroke();
+    c.fillStyle = col; c.fillText(txt, lx, ly);
+}
+
+function drawProtractorPreview(mx, my) {
+    const O = state.protractorO, A = state.protractorA;
+    tmpCtx.clearRect(0,0,tmpCanvas.width,tmpCanvas.height);
+    tmpCtx.save();
+    const col = state.color;
+
+    if (state.protractorStage === 1) {
+        // Dashed guide from O to cursor
+        tmpCtx.strokeStyle = col;
+        tmpCtx.lineWidth = Math.max(1, state.lineWidth * 0.8);
+        tmpCtx.setLineDash([6, 4]); tmpCtx.globalAlpha = 0.72;
+        tmpCtx.beginPath(); tmpCtx.moveTo(O.x, O.y); tmpCtx.lineTo(mx, my); tmpCtx.stroke();
+        tmpCtx.setLineDash([]); tmpCtx.globalAlpha = 1;
+        tmpCtx.fillStyle = col;
+        tmpCtx.beginPath(); tmpCtx.arc(O.x, O.y, 4, 0, Math.PI*2); tmpCtx.fill();
+
+    } else if (state.protractorStage === 2) {
+        // Snap to 5°
+        const sB = _snapProtractorB(O, A, mx, my);
+        const {a1, a2: snappedA2, diff, deg} = sB;
+        const r1 = Math.hypot(A.x-O.x, A.y-O.y);
+        const r2 = Math.hypot(sB.x-O.x, sB.y-O.y);
+        const r  = Math.min(56, Math.min(r1, r2) * 0.50);
+        const lw = Math.max(1, state.lineWidth * 0.8);
+
+        // Two arms (dashed)
+        tmpCtx.strokeStyle = col; tmpCtx.lineWidth = lw;
+        tmpCtx.setLineDash([6, 4]); tmpCtx.globalAlpha = 0.75;
+        tmpCtx.beginPath();
+        tmpCtx.moveTo(O.x, O.y); tmpCtx.lineTo(A.x, A.y);
+        tmpCtx.moveTo(O.x, O.y); tmpCtx.lineTo(sB.x, sB.y);
+        tmpCtx.stroke();
+        tmpCtx.setLineDash([]);
+
+        if (r > 10) {
+            if (deg === 90) {
+                // ── Góc vuông: ký hiệu ∟ đặc biệt ──
+                tmpCtx.globalAlpha = 0.92; tmpCtx.strokeStyle = col; tmpCtx.lineWidth = lw;
+                _drawRightAngleMark(tmpCtx, O, a1, snappedA2, r);
+                // Fill nhẹ hình tam giác vuông
+                tmpCtx.globalAlpha = 0.10; tmpCtx.fillStyle = col;
+                tmpCtx.beginPath();
+                tmpCtx.moveTo(O.x, O.y);
+                tmpCtx.lineTo(O.x + r*Math.cos(a1), O.y + r*Math.sin(a1));
+                tmpCtx.lineTo(O.x + r*Math.cos(a1) + r*Math.cos(snappedA2),
+                              O.y + r*Math.sin(a1) + r*Math.sin(snappedA2));
+                tmpCtx.lineTo(O.x + r*Math.cos(snappedA2), O.y + r*Math.sin(snappedA2));
+                tmpCtx.closePath(); tmpCtx.fill();
+            } else {
+                // Arc thường
+                tmpCtx.globalAlpha = 0.92; tmpCtx.strokeStyle = col; tmpCtx.lineWidth = lw;
+                tmpCtx.beginPath();
+                if (diff >= 0) tmpCtx.arc(O.x, O.y, r, a1, a1+diff);
+                else           tmpCtx.arc(O.x, O.y, r, a1+diff, a1);
+                tmpCtx.stroke();
+                // Wedge fill nhẹ
+                tmpCtx.globalAlpha = 0.10; tmpCtx.fillStyle = col;
+                tmpCtx.beginPath(); tmpCtx.moveTo(O.x, O.y);
+                if (diff >= 0) tmpCtx.arc(O.x, O.y, r, a1, a1+diff);
+                else           tmpCtx.arc(O.x, O.y, r, a1+diff, a1);
+                tmpCtx.closePath(); tmpCtx.fill();
+            }
+        }
+
+        // Nhãn số độ (snapped) — luôn hiển thị
+        tmpCtx.globalAlpha = 1;
+        const midAngle = a1 + diff / 2;
+        const labelR   = r + 28;
+        const lx = O.x + labelR * Math.cos(midAngle);
+        const ly = O.y + labelR * Math.sin(midAngle);
+        const txt = deg === 90 ? '∟ 90°' : deg + '°';
+        _drawDegreePill(tmpCtx, txt, lx, ly, col, 15);
+
+        // O dot
+        tmpCtx.fillStyle = col;
+        tmpCtx.beginPath(); tmpCtx.arc(O.x, O.y, 4, 0, Math.PI*2); tmpCtx.fill();
+    }
+    tmpCtx.restore();
+}
+
+function drawProtractorFinal(O, A, B) {
+    // B đã được snap từ trước khi gọi hàm này
+    const {a1, a2, diff, deg} = _protractorAngle(O, A, B);
+    const r1 = Math.hypot(A.x-O.x, A.y-O.y);
+    const r2 = Math.hypot(B.x-O.x, B.y-O.y);
+    const r  = Math.min(56, Math.min(r1, r2) * 0.50);
+    const lw = Math.max(1, state.lineWidth);
+    const col = state.color;
+
+    ctx.save();
+    ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.setLineDash([]);
+
+    // Hai cạnh
+    ctx.beginPath();
+    ctx.moveTo(O.x, O.y); ctx.lineTo(A.x, A.y);
+    ctx.moveTo(O.x, O.y); ctx.lineTo(B.x, B.y);
+    ctx.stroke();
+
+    // Đỉnh O
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.arc(O.x, O.y, lw + 1.5, 0, Math.PI*2); ctx.fill();
+
+    if (r > 10) {
+        if (deg === 90) {
+            // ── Góc vuông: ký hiệu vuông ∟ ──
+            ctx.globalAlpha = 1;
+            _drawRightAngleMark(ctx, O, a1, a2, r);
+            // Fill nhẹ
+            ctx.globalAlpha = 0.10; ctx.fillStyle = col;
+            ctx.beginPath();
+            ctx.moveTo(O.x, O.y);
+            ctx.lineTo(O.x + r*Math.cos(a1), O.y + r*Math.sin(a1));
+            ctx.lineTo(O.x + r*Math.cos(a1) + r*Math.cos(a2),
+                       O.y + r*Math.sin(a1) + r*Math.sin(a2));
+            ctx.lineTo(O.x + r*Math.cos(a2), O.y + r*Math.sin(a2));
+            ctx.closePath(); ctx.fill();
+        } else {
+            // Arc
+            ctx.globalAlpha = 0.9;
+            ctx.beginPath();
+            if (diff >= 0) ctx.arc(O.x, O.y, r, a1, a1+diff);
+            else           ctx.arc(O.x, O.y, r, a1+diff, a1);
+            ctx.stroke();
+            // Wedge fill
+            ctx.globalAlpha = 0.10; ctx.fillStyle = col;
+            ctx.beginPath(); ctx.moveTo(O.x, O.y);
+            if (diff >= 0) ctx.arc(O.x, O.y, r, a1, a1+diff);
+            else           ctx.arc(O.x, O.y, r, a1+diff, a1);
+            ctx.closePath(); ctx.fill();
+        }
+    }
+
+    // Nhãn độ
+    ctx.globalAlpha = 1;
+    const midAngle = a1 + diff / 2;
+    const labelR   = r + 28;
+    const lx = O.x + labelR * Math.cos(midAngle);
+    const ly = O.y + labelR * Math.sin(midAngle);
+    const fontSize = Math.max(14, lw * 3 + 12);
+    const txt = deg === 90 ? '∟ 90°' : deg + '°';
+    ctx.strokeStyle = col; // reset after arc
+    _drawDegreePill(ctx, txt, lx, ly, col, fontSize);
+    ctx.restore();
 }
 
 function applyStroke(fn) {
@@ -1769,7 +2036,7 @@ function applyStroke(fn) {
 document.querySelectorAll('.tb[data-tool]').forEach(btn => {
     btn.addEventListener('click', () => {
         if (btn.dataset.tool === 'stamp') return; // handled by stamp popup separately
-        commitCurve(); commitArc(); abortPolyFill();
+        commitCurve(); commitArc(); abortPolyFill(); abortProtractor();
         state.tool = btn.dataset.tool;
         closeAllPanels();
         updateUI();
@@ -1782,7 +2049,7 @@ document.querySelectorAll('.tb[data-tool]').forEach(btn => {
 const stampPopup = document.getElementById('stamp-popup');
 document.getElementById('btn-stamp').addEventListener('click', (e) => {
     e.stopPropagation();
-    commitCurve(); commitArc(); abortPolyFill();
+    commitCurve(); commitArc(); abortPolyFill(); abortProtractor();
     state.tool = 'stamp';
     const r = e.currentTarget.getBoundingClientRect();
     stampPopup.style.top = r.top + 'px';
@@ -1809,7 +2076,7 @@ document.getElementById('btn-shapes').addEventListener('click', (e) => {
 });
 document.querySelectorAll('.si').forEach(item => {
     item.addEventListener('click', () => {
-        commitCurve(); commitArc(); abortPolyFill();
+        commitCurve(); commitArc(); abortPolyFill(); abortProtractor();
         state.tool = item.dataset.shape;
         shapePanel.classList.remove('open');
         updateUI();
@@ -2055,7 +2322,7 @@ function placeModel3D(modelId) {
     document.getElementById('models3d-container').appendChild(ov);
 
     // Auto switch to model-select mode
-    commitCurve(); commitArc();
+    commitCurve(); commitArc(); abortProtractor();
     state.tool = 'model-select';
     closeAllPanels();
     updateUI();
@@ -2121,7 +2388,7 @@ document.addEventListener('click', e => {
 
 /* --- model-select tool button --- */
 document.getElementById('btn-model-select').addEventListener('click', () => {
-    commitCurve(); commitArc(); abortPolyFill();
+    commitCurve(); commitArc(); abortPolyFill(); abortProtractor();
     if (state.tool === 'model-select') {
         state.tool = 'pen'; // toggle off
     } else {
@@ -2137,7 +2404,7 @@ document.getElementById('btn-model-select').addEventListener('click', () => {
    POLYGON FILL BUTTON & DOUBLE-CLICK CLOSE
 ───────────────────────────────────────────── */
 document.getElementById('btn-poly-fill').addEventListener('click', () => {
-    commitCurve(); commitArc();
+    commitCurve(); commitArc(); abortProtractor();
     if (state.tool === 'poly-fill') {
         // If already in poly mode and we have ≥3 pts → close polygon
         if (state.polyPoints.length >= 3) {
@@ -2195,7 +2462,7 @@ document.querySelectorAll('.pt-card').forEach(card => {
         e.stopPropagation();
         state.penType = card.dataset.pen;
         // Switch to pen tool automatically
-        commitCurve(); commitArc(); abortPolyFill();
+        commitCurve(); commitArc(); abortPolyFill(); abortProtractor();
         state.tool = 'pen';
         penTypesPanel.classList.remove('open');
         updateUI();
@@ -2701,14 +2968,71 @@ function handleStart(e) {
         return;
     }
 
-    /* Curve tool */
+    /* Thước đo góc thông minh – 3-click: đỉnh → cạnh 1 → cạnh 2 */
+    if (state.tool === 'protractor') {
+        if (state.protractorStage === 0) {
+            state.protractorO = {x, y}; state.protractorStage = 1;
+            tmpCtx.clearRect(0,0,tmpCanvas.width,tmpCanvas.height);
+            tmpCtx.fillStyle = state.color;
+            tmpCtx.beginPath(); tmpCtx.arc(x, y, 4, 0, Math.PI*2); tmpCtx.fill();
+            showToast('📐 Click để chọn cạnh thứ nhất');
+        } else if (state.protractorStage === 1) {
+            // Make sure arm has some length
+            if (Math.hypot(x - state.protractorO.x, y - state.protractorO.y) < 5) return;
+            state.protractorA = {x, y}; state.protractorStage = 2;
+            showToast('📐 Click để chọn cạnh thứ hai — xem góc trực tiếp!');
+        } else if (state.protractorStage === 2) {
+            if (Math.hypot(x - state.protractorO.x, y - state.protractorO.y) < 5) return;
+            // Snap cạnh 2 về bội số 5° trước khi commit
+            const snappedB = _snapProtractorB(state.protractorO, state.protractorA, x, y);
+            drawProtractorFinal(state.protractorO, state.protractorA, snappedB);
+            tmpCtx.clearRect(0,0,tmpCanvas.width,tmpCanvas.height);
+            saveState();
+            state.protractorStage = 0; state.protractorO = state.protractorA = null;
+        }
+        return;
+    }
+
+    /* Curve tool — 3-click: điểm đầu → điểm cuối → kéo điều chỉnh cong → click commit */
     if (state.tool === 'curve') {
         if (state.curveStage === 0) {
-            state.curveStage=1; curveStart={x,y};
-            savedData=ctx.getImageData(0,0,canvas.width,canvas.height);
-            state.isDrawing=true;
+            // Click 1: điểm đầu
+            curveStart = {x, y};
+            savedData  = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            state.curveStage = 1;
+            ctx.save();
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = state.color;
+            ctx.beginPath(); ctx.arc(x, y, Math.max(3, state.lineWidth * 0.5 + 1.5), 0, Math.PI*2); ctx.fill();
+            ctx.restore();
+            showToast('〰️ Click điểm cuối đường cong');
+        } else if (state.curveStage === 1) {
+            // Click 2: điểm cuối
+            curveEnd = {x, y};
+            state.curveStage = 2;
+            tmpCtx.clearRect(0, 0, tmpCanvas.width, tmpCanvas.height);
+            // Vẽ nháp 2 điểm + đường thẳng nối
+            ctx.putImageData(savedData, 0, 0);
+            ctx.save();
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.strokeStyle = state.color; ctx.lineWidth = state.lineWidth;
+            ctx.lineCap = 'round'; ctx.setLineDash([5, 4]); ctx.globalAlpha = 0.5;
+            ctx.beginPath(); ctx.moveTo(curveStart.x, curveStart.y); ctx.lineTo(x, y); ctx.stroke();
+            ctx.setLineDash([]); ctx.globalAlpha = 1;
+            ctx.fillStyle = state.color;
+            ctx.beginPath(); ctx.arc(x, y, Math.max(3, state.lineWidth * 0.5 + 1.5), 0, Math.PI*2); ctx.fill();
+            ctx.restore();
+            showToast('〰️ Di chuột điều chỉnh độ cong — Click để xác nhận');
         } else if (state.curveStage === 2) {
-            state.curveStage=3; curveControl={x,y}; state.isDrawing=true;
+            // Click 3: xác nhận đường cong với điểm điều khiển tại vị trí chuột
+            curveControl = {x, y};
+            ctx.putImageData(savedData, 0, 0);
+            applyStroke(() => {
+                ctx.moveTo(curveStart.x, curveStart.y);
+                ctx.quadraticCurveTo(curveControl.x, curveControl.y, curveEnd.x, curveEnd.y);
+            });
+            saveState();
+            state.curveStage = 0; savedData = null;
         }
         return;
     }
@@ -2828,6 +3152,56 @@ function handleMove(e) {
             tmpCtx.arc(V.x,V.y,r,a1,a2);
         }
         tmpCtx.stroke(); tmpCtx.setLineDash([]); tmpCtx.globalAlpha=1;
+        return;
+    }
+
+    /* Protractor live preview */
+    if (state.tool === 'protractor' && state.protractorStage > 0) {
+        const {x, y} = getXY(e);
+        drawProtractorPreview(x, y);
+        return;
+    }
+
+    /* Curve tool — live preview (không cần isDrawing) */
+    if (state.tool === 'curve' && state.curveStage > 0) {
+        const {x, y} = getXY(e);
+        if (state.curveStage === 1) {
+            // Giai đoạn 1: hiển thị đường dẫn nháp từ điểm đầu đến con trỏ
+            tmpCtx.clearRect(0, 0, tmpCanvas.width, tmpCanvas.height);
+            tmpCtx.save();
+            tmpCtx.strokeStyle = state.color;
+            tmpCtx.lineWidth   = Math.max(1, state.lineWidth * 0.8);
+            tmpCtx.setLineDash([6, 4]); tmpCtx.globalAlpha = 0.65;
+            tmpCtx.beginPath();
+            tmpCtx.moveTo(curveStart.x, curveStart.y); tmpCtx.lineTo(x, y);
+            tmpCtx.stroke();
+            tmpCtx.restore();
+        } else if (state.curveStage === 2) {
+            // Giai đoạn 2: hiển thị đường cong với điểm điều khiển tại con trỏ
+            if (!savedData) return;
+            ctx.putImageData(savedData, 0, 0);
+            ctx.save();
+            ctx.globalCompositeOperation = 'source-over';
+            // Đường cong chính
+            ctx.strokeStyle = state.color; ctx.lineWidth = state.lineWidth;
+            ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.setLineDash([]);
+            ctx.beginPath();
+            ctx.moveTo(curveStart.x, curveStart.y);
+            ctx.quadraticCurveTo(x, y, curveEnd.x, curveEnd.y);
+            ctx.stroke();
+            // Đường kẻ điều khiển (dashed xám)
+            ctx.strokeStyle = '#9ca3af'; ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]); ctx.globalAlpha = 0.6;
+            ctx.beginPath();
+            ctx.moveTo(curveStart.x, curveStart.y); ctx.lineTo(x, y);
+            ctx.lineTo(curveEnd.x, curveEnd.y);
+            ctx.stroke();
+            // Điểm điều khiển (đỏ)
+            ctx.setLineDash([]); ctx.globalAlpha = 1;
+            ctx.fillStyle = '#ef4444';
+            ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI*2); ctx.fill();
+            ctx.restore();
+        }
         return;
     }
 
@@ -3122,14 +3496,33 @@ function drawPenSegment(x2, y2) {
         }
 
         case 'fountain': {
-            // Speed × pressure: fast/light → thin, slow/heavy → thick
-            const speed = dist;
-            const w = lw * Math.max(0.3, Math.min(2.6, (2.8 - speed * 0.05) * (0.45 + p * 0.9)));
-            ctx.strokeStyle = col;
-            ctx.lineWidth = w;
-            ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-            ctx.globalAlpha = 0.88 + p * 0.1;
-            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+            // ── Bút mài (nib pen) ──────────────────────────────────────
+            // Nguyên lý chữ đẹp: ngòi cắt 45°
+            //   nét ngang / theo chiều ngòi  → hairline (cực mảnh)
+            //   nét dọc  / vuông góc ngòi    → bold     (cực đậm)
+            // Tỉ lệ thick : thin ≈ 10 : 1
+            // Speed-sensitive: viết chậm → nét đậm, viết nhanh → nét mảnh
+            const angle    = Math.atan2(dy, dx);
+            const NIB      = Math.PI / 4;            // 45° — góc mài ngòi
+            const t        = Math.abs(Math.sin(angle - NIB));  // 0→mảnh, 1→đậm
+            const hairline = Math.max(0.35, lw * 0.08);
+            // Giảm bold còn 1/2 so với trước
+            const boldBase = lw * (1.8 + p * 1.3);
+            // speedFactor: dist nhỏ (viết chậm) → 1.0, dist lớn (viết nhanh) → ~0.15
+            const speedFactor = Math.max(0.15, 1 / (1 + dist * 0.18));
+            const bold     = boldBase * speedFactor;
+            const w        = hairline + (bold - hairline) * t;
+            const px = Math.sin(angle) * w / 2;
+            const py = -Math.cos(angle) * w / 2;
+            ctx.fillStyle   = col;
+            ctx.globalAlpha = 0.93 + p * 0.06;
+            ctx.beginPath();
+            ctx.moveTo(x1 - px, y1 - py);
+            ctx.lineTo(x2 - px, y2 - py);
+            ctx.lineTo(x2 + px, y2 + py);
+            ctx.lineTo(x1 + px, y1 + py);
+            ctx.closePath(); ctx.fill();
+            ctx.beginPath(); ctx.arc(x2, y2, w / 2, 0, Math.PI * 2); ctx.fill();
             break;
         }
 
@@ -3171,12 +3564,65 @@ function drawPenSegment(x2, y2) {
         }
 
         case 'marker': {
-            // Marker mostly flat, slight pressure for opacity
+            // ── Bút dạ (marker) ────────────────────────────────────────
             ctx.strokeStyle = col;
-            ctx.lineWidth = lw * 3.0;
-            ctx.lineCap = 'square'; ctx.lineJoin = 'round';
-            ctx.globalAlpha = 0.78 + p * 0.15;
+            ctx.lineWidth = lw * 1.8;
+            ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            ctx.globalAlpha = 0.36 + p * 0.12;
             ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+            ctx.lineWidth = lw * 1.8 + 1;
+            ctx.globalAlpha = 0.08 + p * 0.05;
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+            break;
+        }
+
+        case 'copperplate': {
+            // ── Ngòi mềm — Copperplate (pointed flexible nib) ──────────
+            // Áp lực tay điều khiển hoàn toàn độ dày, không phụ thuộc góc.
+            // Nhấn nhẹ  → hairline (như sợi tóc)
+            // Nhấn mạnh → nét đậm rộng
+            // Dùng hàm p^1.1 để đáp ứng tuyến tính nhưng hơi mềm ở đầu
+            const angle_cp = Math.atan2(dy, dx);
+            const thick_cp = lw * (4.0 + p * 3.2);              // rất đậm khi nhấn mạnh
+            const thin_cp  = Math.max(0.3, lw * 0.06);           // hairline khi nhấn nhẹ
+            const w_cp     = thin_cp + (thick_cp - thin_cp) * Math.pow(p, 1.1);
+            const px_cp = Math.sin(angle_cp) * w_cp / 2;
+            const py_cp = -Math.cos(angle_cp) * w_cp / 2;
+            ctx.fillStyle   = col;
+            ctx.globalAlpha = 0.94 + p * 0.05;
+            ctx.beginPath();
+            ctx.moveTo(x1 - px_cp, y1 - py_cp);
+            ctx.lineTo(x2 - px_cp, y2 - py_cp);
+            ctx.lineTo(x2 + px_cp, y2 + py_cp);
+            ctx.lineTo(x1 + px_cp, y1 + py_cp);
+            ctx.closePath(); ctx.fill();
+            ctx.beginPath(); ctx.arc(x2, y2, w_cp / 2, 0, Math.PI * 2); ctx.fill();
+            break;
+        }
+
+        case 'italic': {
+            // ── Ngòi nghiêng — Italic / Broad-edge nib ──────────────────
+            // Ngòi phẳng cắt ngang 0° (nằm ngang).
+            // Nét ngang → đậm nhất (cos = 1)
+            // Nét dọc   → mảnh nhất (cos = 0)
+            // Ngược hoàn toàn với bút mài (sin-based 45°), tạo nhịp điệu chữ rất khác.
+            const angle_it = Math.atan2(dy, dx);
+            const NIB_IT   = 0;                                   // 0° — ngòi nằm ngang
+            const t_it     = Math.abs(Math.cos(angle_it - NIB_IT)); // 1=ngang, 0=dọc
+            const thin_it  = Math.max(0.35, lw * 0.08);
+            const thick_it = lw * (3.6 + p * 2.6);
+            const w_it     = thin_it + (thick_it - thin_it) * t_it;
+            const px_it = Math.sin(angle_it) * w_it / 2;
+            const py_it = -Math.cos(angle_it) * w_it / 2;
+            ctx.fillStyle   = col;
+            ctx.globalAlpha = 0.93 + p * 0.06;
+            ctx.beginPath();
+            ctx.moveTo(x1 - px_it, y1 - py_it);
+            ctx.lineTo(x2 - px_it, y2 - py_it);
+            ctx.lineTo(x2 + px_it, y2 + py_it);
+            ctx.lineTo(x1 + px_it, y1 + py_it);
+            ctx.closePath(); ctx.fill();
+            ctx.beginPath(); ctx.arc(x2, y2, w_it / 2, 0, Math.PI * 2); ctx.fill();
             break;
         }
 
@@ -3386,10 +3832,10 @@ canvas.addEventListener('pointerleave', e => {
 window.addEventListener('keydown', e => {
     if ((e.ctrlKey||e.metaKey) && e.key==='z') { e.preventDefault(); undo(); }
     if ((e.ctrlKey||e.metaKey) && e.key==='y') { e.preventDefault(); redo(); }
-    if (e.key==='Escape') { commitCurve(); commitArc(); abortPolyFill(); closeAllPanels(); }
+    if (e.key==='Escape') { commitCurve(); commitArc(); abortPolyFill(); abortProtractor(); closeAllPanels(); }
 
-    // F = Fullscreen toggle (gọi cùng nút btnFS để đồng bộ icon)
-    if (!e.ctrlKey && !e.metaKey && e.key === 'f') {
+    // F / f = Fullscreen toggle (gọi cùng nút btnFS để đồng bộ icon)
+    if (!e.ctrlKey && !e.metaKey && e.key.toLowerCase() === 'f') {
         e.preventDefault();
         document.getElementById('btn-fullscreen') && document.getElementById('btn-fullscreen').click();
         return;
@@ -3398,7 +3844,7 @@ window.addEventListener('keydown', e => {
     // Quick-access tool keys  (g = đa giác tô màu, thay cho f cũ)
     const km = {p:'pen', e:'eraser', t:'text', h:'highlight', m:'model-select', g:'poly-fill'};
     if (!e.ctrlKey && !e.metaKey && km[e.key]) {
-        commitCurve(); commitArc(); abortPolyFill();
+        commitCurve(); commitArc(); abortPolyFill(); abortProtractor();
         state.tool = (state.tool === km[e.key] && e.key==='m') ? 'pen' : km[e.key];
         closeAllPanels(); updateUI();
     }
@@ -3592,15 +4038,51 @@ window.addEventListener('keydown', e => {
         }
     }
 
+    /**
+     * Escape HTML nhưng giữ nguyên $ \ ^ _ { } để MathJax hoạt động.
+     */
+    function escHtml(s) {
+        return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    /**
+     * Tách thành segments text/math, chỉ chèn xuống dòng ở phần text.
+     * Giữ nguyên nội dung $...$ và $$...$$ cho MathJax.
+     */
+    function formatQuestionHtml(raw) {
+        const parts = [];
+        const mathRe = /(\$\$[\s\S]*?\$\$|\$[^$\n]+?\$)/g;
+        let lastIdx = 0, m;
+        while ((m = mathRe.exec(raw)) !== null) {
+            if (m.index > lastIdx)
+                parts.push({ t: 'text', v: raw.slice(lastIdx, m.index) });
+            parts.push({ t: 'math', v: m[0] });
+            lastIdx = m.index + m[0].length;
+        }
+        if (lastIdx < raw.length)
+            parts.push({ t: 'text', v: raw.slice(lastIdx) });
+
+        return parts.map(p => {
+            if (p.t === 'math') return p.v;   // giữ nguyên công thức
+            let s = escHtml(p.v);
+            s = s.replace(/\n/g, '<br>');
+            // Thêm <br> trước a) b) c) d) e) khi xuất hiện giữa chuỗi
+            // (1–4 khoảng trắng trước chữ cái + dấu ngoặc)
+            s = s.replace(/\s{1,4}([a-eA-E]\))\s*/g, '<br>$1 ');
+            return s;
+        }).join('');
+    }
+
     /** Hiển thị câu hỏi thứ qIndex */
     function showQuestion() {
         if (!questions.length) return;
         qIndex = Math.max(0, Math.min(qIndex, questions.length - 1));
 
-        // Đặt nội dung: giữ $...$ nguyên vẹn để MathJax xử lý,
-        // escape các ký tự HTML nguy hiểm trừ dấu $ và \
         const raw = questions[qIndex];
-        qText.textContent = raw;      // textContent tự escape, MathJax đọc text nodes ✓
+        const bodyHtml = formatQuestionHtml(raw);
+        // Tiêu đề "Câu X." in đậm, màu tím
+        const label = `<span class="q-label">Câu ${qIndex + 1}.</span> `;
+        qText.innerHTML = label + bodyHtml;
 
         qCounter.textContent = `${qIndex + 1} / ${questions.length}`;
         const pct = questions.length > 1
