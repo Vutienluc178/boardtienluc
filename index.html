@@ -5,6 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Bảng vẽ Hình học – Thầy Vũ Tiến Lực</title>
 <script src="https://unpkg.com/lucide@latest"></script>
+<!-- PapaParse for Google Sheet CSV -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<!-- MathJax for LaTeX rendering -->
+<script>
+window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+    options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] },
+    startup: { typeset: false }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
 <style>
 /* ══════════════════════════════════════════════════════
    LOGIN OVERLAY
@@ -155,6 +166,166 @@
 .login-card.shake { animation: loginShake .4s ease; }
 
 /* ══════════════════════════════════════════════════════
+   QUESTION OVERLAY  (top-edge, non-intrusive)
+══════════════════════════════════════════════════════ */
+/* ── Question bar — full-width, left-aligned, transparent ── */
+#q-bar {
+    position: fixed;
+    top: 0; left: 74px; right: 0;
+    z-index: 800;
+    display: none;
+    flex-direction: column;
+    background: transparent;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .3s ease;
+}
+#q-bar.open { display: flex; opacity: 1; }
+
+/* Progress line — hairline at top */
+#q-progress {
+    width: 100%; height: 3px; flex-shrink: 0;
+    background: rgba(0,0,0,.08);
+    overflow: hidden; pointer-events: none;
+}
+#q-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6366f1, #10b981);
+    transition: width .35s ease;
+}
+
+/* Question text body */
+#q-body {
+    padding: 14px 48px 6px 36px;
+    pointer-events: auto;
+}
+#q-text {
+    font-size: 46px;
+    font-weight: 700;
+    line-height: 1.45;
+    color: #1e1b4b;
+    text-align: left;
+    word-break: break-word;
+    /* halo for contrast on white/light boards */
+    text-shadow:
+        0 0 16px rgba(255,255,255,1),
+        0 0 32px rgba(255,255,255,.9),
+        2px  2px 0 rgba(255,255,255,.7),
+       -2px -2px 0 rgba(255,255,255,.7),
+        2px -2px 0 rgba(255,255,255,.7),
+       -2px  2px 0 rgba(255,255,255,.7);
+    user-select: text;
+}
+/* MathJax inherits font size */
+#q-text mjx-container { font-size: inherit !important; }
+
+/* ── Control pill — pinned bottom-right of bar area ── */
+#q-controls {
+    align-self: flex-start;
+    margin: 2px 0 6px 36px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    pointer-events: auto;
+    background: rgba(15,23,42,.78);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 999px;
+    padding: 3px 3px 3px 6px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.4);
+    height: 32px;
+}
+
+/* hide legacy strips */
+#q-bar-top { display: none; }
+#q-nav      { display: none; }
+
+.q-nav-btn {
+    background: none; border: none;
+    color: #94a3b8; font-size: 14px;
+    width: 26px; height: 26px; border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .12s, color .12s; flex-shrink: 0;
+}
+.q-nav-btn:hover:not(:disabled) { background: rgba(99,102,241,.3); color: #c7d2fe; }
+.q-nav-btn:disabled { opacity: .25; cursor: not-allowed; }
+
+#q-counter {
+    font-size: 11px; font-weight: 700; letter-spacing: .5px;
+    color: #64748b; white-space: nowrap; min-width: 42px; text-align: center;
+}
+#q-load-status { display: none; }
+
+#q-close-btn {
+    background: none; border: none; cursor: pointer;
+    color: #475569; font-size: 12px;
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .12s, color .12s; flex-shrink: 0;
+    margin-left: 4px;
+}
+#q-close-btn:hover { color: #f87171; background: rgba(248,113,113,.18); }
+
+/* ── Sidebar trigger button for question panel ── */
+#btn-question-load {
+    background: linear-gradient(135deg, rgba(99,102,241,.18), rgba(16,185,129,.12));
+    border: 1px solid rgba(99,102,241,.3);
+    color: #a5b4fc;
+}
+#btn-question-load:hover {
+    background: linear-gradient(135deg, rgba(99,102,241,.30), rgba(16,185,129,.22));
+    border-color: rgba(99,102,241,.5);
+}
+#btn-question-load.ql-active {
+    background: linear-gradient(135deg, rgba(99,102,241,.32), rgba(16,185,129,.25));
+    border-color: #6366f1; color: #c7d2fe;
+}
+
+/* Sheet input panel */
+#q-sheet-panel {
+    position: fixed;
+    left: 82px; bottom: 54px;
+    width: 340px;
+    background: rgba(10,14,28,.97);
+    border: 1px solid rgba(99,102,241,.35);
+    border-radius: 14px;
+    padding: 16px;
+    z-index: 810;
+    display: none;
+    box-shadow: 0 8px 40px rgba(0,0,0,.55);
+    backdrop-filter: blur(16px);
+}
+#q-sheet-panel.open { display: block; }
+#q-sheet-panel h4 {
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+    color: #6366f1; text-transform: uppercase; margin-bottom: 10px;
+}
+#q-sheet-input {
+    width: 100%; padding: 9px 11px;
+    background: rgba(255,255,255,.05);
+    border: 1.5px solid rgba(255,255,255,.09);
+    border-radius: 9px; color: #f1f5f9;
+    font-size: 12px; font-family: monospace;
+    outline: none; margin-bottom: 8px;
+    transition: border-color .2s;
+}
+#q-sheet-input:focus { border-color: #6366f1; }
+#q-sheet-input::placeholder { color: #334155; font-family: inherit; }
+#q-sheet-fetch-btn {
+    width: 100%; padding: 9px;
+    background: linear-gradient(135deg,#6366f1,#4f46e5);
+    border: none; border-radius: 9px;
+    color: #fff; font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: opacity .15s;
+}
+#q-sheet-fetch-btn:hover { opacity: .88; }
+#q-sheet-msg {
+    margin-top: 8px; font-size: 11px;
+    color: #64748b; text-align: center; min-height: 16px;
+}
+
+/* ══════════════════════════════════════════════════════
    RESET & BASE
 ══════════════════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -213,6 +384,18 @@ html, body {
 
 /* Watermark adapts on dark boards */
 #board[data-dark="true"] .wm { color: rgba(255,255,255,.18); }
+
+/* Question text colour adapts to board background */
+#q-bar.dark-board #q-text {
+    color: #f0fdf4;
+    text-shadow:
+        0 0 18px rgba(0,0,0,1),
+        0 0 36px rgba(0,0,0,.9),
+        2px  2px 0 rgba(0,0,0,.8),
+       -2px -2px 0 rgba(0,0,0,.8),
+        2px -2px 0 rgba(0,0,0,.8),
+       -2px  2px 0 rgba(0,0,0,.8);
+}
 
 /* ── Background swatch picker ─────────────────────────── */
 #bg-picker {
@@ -1152,7 +1335,54 @@ canvas { touch-action: none; -ms-touch-action: none; }
         <i data-lucide="sparkles" style="width:12px;height:12px"></i> SVG Play
     </a>
 
+    <button class="tb-full" id="btn-question-load"
+            data-tip="Tải câu hỏi từ Google Sheet &amp; hiển thị trên bảng"
+            style="margin-top:4px">
+        <i data-lucide="book-open"></i> Câu hỏi
+    </button>
+
 </aside>
+
+<!-- ═══════════════════  QUESTION TOP BAR  ═══════════════════ -->
+<div id="q-bar">
+    <!-- thin progress line -->
+    <div id="q-progress"><div id="q-progress-fill" style="width:0%"></div></div>
+
+    <!-- large transparent question text -->
+    <div id="q-body">
+        <div id="q-text"></div>
+    </div>
+
+    <!-- compact floating pill: ◀ counter ▶ ✕ -->
+    <div id="q-controls">
+        <button class="q-nav-btn" id="q-prev-btn" disabled title="Câu trước (←)">◀</button>
+        <span id="q-counter">0 / 0</span>
+        <button class="q-nav-btn" id="q-next-btn" disabled title="Câu sau (→)">▶</button>
+        <button id="q-close-btn" title="Tắt câu hỏi">✕</button>
+    </div>
+
+    <!-- kept hidden for JS compat -->
+    <div id="q-bar-top" style="display:none">
+        <span id="q-load-status"></span>
+    </div>
+    <div id="q-nav" style="display:none"></div>
+</div>
+
+<!-- ═══════════════════  SHEET INPUT PANEL  ═══════════════════ -->
+<div id="q-sheet-panel">
+    <h4>📋 Tải câu hỏi từ Google Sheet</h4>
+    <div style="font-size:10.5px;color:#64748b;line-height:1.55;margin-bottom:10px;padding:7px 9px;background:rgba(99,102,241,.07);border-radius:7px;border-left:2px solid #6366f1">
+        💡 <b style="color:#a5b4fc">Cách dùng tốt nhất:</b><br>
+        Mở Sheet → <b style="color:#94a3b8">File → Share → Publish to web</b>
+        → chọn tab → chọn <b style="color:#94a3b8">CSV</b> → <b style="color:#94a3b8">Publish</b>
+        → Copy link → Dán vào đây.<br>
+        <span style="color:#475569">Hoặc dùng link chia sẻ thường (có thể chậm hơn).</span>
+    </div>
+    <input id="q-sheet-input" type="text"
+           placeholder="Dán link Google Sheet…">
+    <button id="q-sheet-fetch-btn">⬇ Tải câu hỏi</button>
+    <div id="q-sheet-msg"></div>
+</div>
 
 <!-- ═══════════════════════  STAMP POPUP  ═══════════════════════ -->
 <div id="stamp-popup">
@@ -1618,9 +1848,12 @@ const BG_CLASSES = ['bg-plain','bg-grid','bg-oxy','bg-dots','bg-lined','bg-paper
 function applyBackground(name) {
     BG_CLASSES.forEach(c => board.classList.remove(c));
     board.classList.add('bg-' + name);
-    // Dark mode flag for watermark / UI inversion
+    // Dark mode flag for watermark / question text colour
     const isDark = (name === 'dark' || name === 'chalkboard');
     board.dataset.dark = isDark ? 'true' : 'false';
+    // Sync question bar text colour
+    const qBar = document.getElementById('q-bar');
+    if (qBar) qBar.classList.toggle('dark-board', isDark);
 }
 document.getElementById('btn-undo').addEventListener('click', undo);
 document.getElementById('btn-redo').addEventListener('click', redo);
@@ -3256,6 +3489,249 @@ window.addEventListener('keydown', e => {
         eyeBtn.textContent = isHidden ? '🙈' : '👁';
         pwInput.focus();
     });
+})();
+
+/* ═══════════════════════════════════════════════════════════
+   GOOGLE SHEET  QUESTION  SYSTEM
+   ─────────────────────────────────────────────────────────
+   • Nhận URL Google Sheet (bất kỳ dạng /d/ID/)
+   • Chuyển sang export CSV rồi parse cột đầu tiên
+   • Hiển thị câu hỏi trên q-bar (top edge, non-intrusive)
+   • Render LaTeX $...$ / $$...$$ bằng MathJax 3
+═══════════════════════════════════════════════════════════ */
+(function initQuestionSystem() {
+
+    /* ── DOM refs ── */
+    const qBar        = document.getElementById('q-bar');
+    const qText       = document.getElementById('q-text');
+    const qCounter    = document.getElementById('q-counter');
+    const qProgFill   = document.getElementById('q-progress-fill');
+    const qStatus     = document.getElementById('q-load-status');
+    const qPrev       = document.getElementById('q-prev-btn');
+    const qNext       = document.getElementById('q-next-btn');
+    const qCloseBtn   = document.getElementById('q-close-btn');
+    const sheetPanel  = document.getElementById('q-sheet-panel');
+    const sheetInput  = document.getElementById('q-sheet-input');
+    const fetchBtn    = document.getElementById('q-sheet-fetch-btn');
+    const sheetMsg    = document.getElementById('q-sheet-msg');
+    const sideBtn     = document.getElementById('btn-question-load');
+
+    /* ── State ── */
+    let questions = [];
+    let qIndex    = 0;
+
+    /* ── Helpers ── */
+
+    /**
+     * Trả về { pubUrl, exportUrl } từ bất kỳ dạng link Google Sheet nào.
+     * pubUrl   = /pub?output=csv  → KHÔNG cần proxy (sheet phải "Publish to web")
+     * exportUrl= /export?format=csv → cần proxy (sheet "Anyone with link")
+     */
+    function parseSheetUrls(raw) {
+        raw = raw.trim();
+
+        // Đã là pub URL → dùng thẳng
+        if (/\/pub\?/.test(raw)) {
+            const u = raw.includes('output=csv') ? raw : raw + '&output=csv';
+            return { pubUrl: u, exportUrl: null };
+        }
+
+        // Đã là export URL
+        if (raw.includes('export?format=csv') || raw.includes('export?')) {
+            return { pubUrl: null, exportUrl: raw };
+        }
+
+        // Lấy spreadsheet ID
+        const m = raw.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+        if (!m) return null;
+        const id  = m[1];
+        const gm  = raw.match(/[#&?]gid=(\d+)/);
+        const gid = gm ? gm[1] : '0';
+
+        return {
+            pubUrl:    `https://docs.google.com/spreadsheets/d/${id}/pub?output=csv&gid=${gid}`,
+            exportUrl: `https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=${gid}`
+        };
+    }
+
+    /** Fetch với timeout (ms) */
+    function fetchTimeout(url, ms) {
+        const ctrl = new AbortController();
+        const tid  = setTimeout(() => ctrl.abort(), ms);
+        return fetch(url, { signal: ctrl.signal, cache: 'no-store' })
+            .then(r => { clearTimeout(tid); if (!r.ok) throw new Error(r.status); return r.text(); })
+            .catch(e => { clearTimeout(tid); throw e; });
+    }
+
+    /** Thử lần lượt các URL cho đến khi thành công, trả về text CSV */
+    async function fetchCSV(urlsToTry) {
+        for (const { label, url } of urlsToTry) {
+            sheetMsg.style.color = '#94a3b8';
+            sheetMsg.textContent = `⏳ Đang thử ${label}…`;
+            try {
+                const text = await fetchTimeout(url, 9000);
+                // Kiểm tra Google không trả về trang đăng nhập HTML
+                if (text.trimStart().startsWith('<!')) {
+                    throw new Error('HTML response (sheet chưa public)');
+                }
+                return text;
+            } catch (_) { /* thử tiếp */ }
+        }
+        return null;
+    }
+
+    /** Call MathJax typeset trên q-text */
+    function renderMath() {
+        if (!window.MathJax) return;
+        // Xoá cache cũ của MathJax trên node này rồi typeset lại
+        if (MathJax.typesetClear) MathJax.typesetClear([qText]);
+        if (MathJax.typesetPromise) {
+            MathJax.typesetPromise([qText]).catch(() => {});
+        } else if (MathJax.typeset) {
+            try { MathJax.typeset([qText]); } catch(_) {}
+        }
+    }
+
+    /** Hiển thị câu hỏi thứ qIndex */
+    function showQuestion() {
+        if (!questions.length) return;
+        qIndex = Math.max(0, Math.min(qIndex, questions.length - 1));
+
+        // Đặt nội dung: giữ $...$ nguyên vẹn để MathJax xử lý,
+        // escape các ký tự HTML nguy hiểm trừ dấu $ và \
+        const raw = questions[qIndex];
+        qText.textContent = raw;      // textContent tự escape, MathJax đọc text nodes ✓
+
+        qCounter.textContent = `${qIndex + 1} / ${questions.length}`;
+        const pct = questions.length > 1
+            ? (qIndex / (questions.length - 1) * 100).toFixed(1) : 100;
+        qProgFill.style.width = pct + '%';
+        qPrev.disabled = qIndex === 0;
+        qNext.disabled = qIndex === questions.length - 1;
+
+        renderMath();
+    }
+
+    /** Tải câu hỏi từ Google Sheet URL */
+    async function loadFromSheet(rawUrl) {
+        fetchBtn.disabled = true;
+        sheetMsg.style.color = '#94a3b8';
+        sheetMsg.textContent = '⏳ Đang phân tích link…';
+
+        const parsed = parseSheetUrls(rawUrl);
+        if (!parsed) {
+            sheetMsg.style.color = '#f87171';
+            sheetMsg.textContent = '❌ Không nhận ra link Google Sheet. Hãy kiểm tra lại.';
+            fetchBtn.disabled = false;
+            return;
+        }
+
+        // Xây danh sách các URL sẽ thử theo thứ tự ưu tiên
+        const attempts = [];
+
+        // 1. pubUrl trực tiếp (không cần proxy, nếu sheet đã "Publish to web")
+        if (parsed.pubUrl)
+            attempts.push({ label: 'Publish URL trực tiếp', url: parsed.pubUrl });
+
+        // 2–4. exportUrl qua 3 CORS proxy khác nhau
+        if (parsed.exportUrl) {
+            const enc = encodeURIComponent(parsed.exportUrl);
+            attempts.push(
+                { label: 'proxy corsproxy.io',  url: `https://corsproxy.io/?${enc}` },
+                { label: 'proxy allorigins',     url: `https://api.allorigins.win/raw?url=${enc}` },
+                { label: 'proxy codetabs',       url: `https://api.codetabs.com/v1/proxy?quest=${enc}` }
+            );
+        }
+
+        const csvText = await fetchCSV(attempts);
+
+        if (!csvText) {
+            sheetMsg.style.color = '#f87171';
+            sheetMsg.innerHTML =
+                '❌ Không tải được. Hãy vào <b>File → Share → Publish to web</b> ' +
+                '→ chọn <b>CSV</b> → Copy link rồi dán vào đây.';
+            fetchBtn.disabled = false;
+            return;
+        }
+
+        // Parse CSV – cột đầu tiên
+        const result = Papa.parse(csvText, { skipEmptyLines: true });
+        const rows = result.data
+            .map(r => (r[0] || '').trim())
+            .filter(s => s.length > 0);
+
+        if (!rows.length) {
+            sheetMsg.style.color = '#f87171';
+            sheetMsg.textContent = '❌ Sheet trống hoặc cột A không có dữ liệu.';
+            fetchBtn.disabled = false;
+            return;
+        }
+
+        questions = rows;
+        qIndex    = 0;
+        sheetMsg.style.color = '#34d399';
+        sheetMsg.textContent = `✓ Đã tải ${questions.length} câu hỏi!`;
+
+        setTimeout(() => {
+            sheetPanel.classList.remove('open');
+            sideBtn.classList.add('ql-active');
+            qBar.classList.add('open');
+            qStatus.textContent = `${questions.length} câu hỏi đã tải`;
+            showQuestion();
+        }, 500);
+
+        fetchBtn.disabled = false;
+    }
+
+    /* ── Event: sidebar button → toggle sheet input panel ── */
+    sideBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        sheetPanel.classList.toggle('open');
+    });
+
+    document.addEventListener('click', e => {
+        if (!sheetPanel.contains(e.target) && e.target !== sideBtn)
+            sheetPanel.classList.remove('open');
+    });
+
+    /* ── Event: fetch button ── */
+    fetchBtn.addEventListener('click', () => {
+        const url = sheetInput.value.trim();
+        if (!url) { sheetMsg.style.color='#f87171'; sheetMsg.textContent='⚠ Hãy nhập link trước.'; return; }
+        loadFromSheet(url);
+    });
+    sheetInput.addEventListener('keydown', e => { if (e.key==='Enter') fetchBtn.click(); });
+
+    /* ── Navigation ── */
+    qNext.addEventListener('click', () => { if (qIndex < questions.length-1) { qIndex++; showQuestion(); } });
+    qPrev.addEventListener('click', () => { if (qIndex > 0) { qIndex--; showQuestion(); } });
+
+    /* ── Close bar ── */
+    qCloseBtn.addEventListener('click', () => {
+        qBar.classList.remove('open');
+        sideBtn.classList.remove('ql-active');
+    });
+
+    /* ── Keyboard: ArrowRight / ArrowLeft when q-bar is open ── */
+    window.addEventListener('keydown', e => {
+        if (!qBar.classList.contains('open')) return;
+        // Only if not typing in an input
+        if (document.activeElement.tagName === 'INPUT' ||
+            document.activeElement.tagName === 'TEXTAREA') return;
+        if (e.key === 'ArrowRight' && !e.ctrlKey) { e.preventDefault(); qNext.click(); }
+        if (e.key === 'ArrowLeft'  && !e.ctrlKey) { e.preventDefault(); qPrev.click(); }
+    });
+
+    /* ── Auto-restore from localStorage if questions were loaded ── */
+    const savedURL = localStorage.getItem('bangve_qsheet_url');
+    if (savedURL) sheetInput.value = savedURL;
+
+    /* Track last used URL */
+    fetchBtn.addEventListener('click', () => {
+        const u = sheetInput.value.trim();
+        if (u) localStorage.setItem('bangve_qsheet_url', u);
+    }, true); // capture phase so it fires before loadFromSheet
+
 })();
 
 /* ─────────────────────────────────────────────
