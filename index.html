@@ -286,6 +286,34 @@ window.MathJax = {
 }
 #q-close-btn:hover { color: #f87171; background: rgba(248,113,113,.18); }
 
+/* ── Nút thu gọn / mở rộng câu hỏi ── */
+#q-collapse-btn {
+    background: none; border: none; cursor: pointer;
+    font-size: 13px; line-height: 1;
+    width: 28px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .12s, color .12s, transform .2s; flex-shrink: 0;
+    color: #94a3b8;
+    margin-left: 2px;
+}
+#q-collapse-btn:hover { background: rgba(99,102,241,.22); color: #c7d2fe; }
+
+/* Trạng thái thu gọn: ẩn vùng chữ, chỉ hiện pill điều khiển */
+#q-bar.q-collapsed #q-body {
+    display: none;
+}
+#q-bar.q-collapsed #q-progress {
+    display: none;
+}
+/* Pill nổi khi thu gọn (không còn gắn với q-body) */
+#q-bar.q-collapsed #q-controls {
+    margin-top: 6px;
+}
+/* Animate icon xoay khi thu / mở */
+#q-collapse-btn.collapsed-icon {
+    transform: rotate(180deg);
+}
+
 /* ── Sidebar trigger button for question panel ── */
 #btn-question-load {
     background: linear-gradient(135deg, rgba(99,102,241,.18), rgba(16,185,129,.12));
@@ -1380,11 +1408,12 @@ canvas { touch-action: none; -ms-touch-action: none; }
         <div id="q-text"></div>
     </div>
 
-    <!-- compact floating pill: ◀ counter ▶ ✕ -->
+    <!-- compact floating pill: ◀ counter ▶ 👁 ✕ -->
     <div id="q-controls">
         <button class="q-nav-btn" id="q-prev-btn" disabled title="Câu trước (←)">◀</button>
         <span id="q-counter">0 / 0</span>
         <button class="q-nav-btn" id="q-next-btn" disabled title="Câu sau (→)">▶</button>
+        <button id="q-collapse-btn" title="Thu gọn / Hiện câu hỏi">▲</button>
         <button id="q-close-btn" title="Tắt câu hỏi">✕</button>
     </div>
 
@@ -3953,9 +3982,10 @@ window.addEventListener('keydown', e => {
     const qCounter    = document.getElementById('q-counter');
     const qProgFill   = document.getElementById('q-progress-fill');
     const qStatus     = document.getElementById('q-load-status');
-    const qPrev       = document.getElementById('q-prev-btn');
-    const qNext       = document.getElementById('q-next-btn');
-    const qCloseBtn   = document.getElementById('q-close-btn');
+    const qPrev         = document.getElementById('q-prev-btn');
+    const qNext         = document.getElementById('q-next-btn');
+    const qCloseBtn     = document.getElementById('q-close-btn');
+    const qCollapseBtn  = document.getElementById('q-collapse-btn');
     const sheetPanel  = document.getElementById('q-sheet-panel');
     const sheetInput  = document.getElementById('q-sheet-input');
     const fetchBtn    = document.getElementById('q-sheet-fetch-btn');
@@ -4091,6 +4121,12 @@ window.addEventListener('keydown', e => {
         qPrev.disabled = qIndex === 0;
         qNext.disabled = qIndex === questions.length - 1;
 
+        // Mỗi khi chuyển sang câu mới: tự mở rộng lại (bỏ trạng thái thu gọn)
+        qBar.classList.remove('q-collapsed');
+        qCollapseBtn.textContent = '▲';
+        qCollapseBtn.title = 'Thu gọn câu hỏi';
+        qCollapseBtn.classList.remove('collapsed-icon');
+
         renderMath();
     }
 
@@ -4191,7 +4227,24 @@ window.addEventListener('keydown', e => {
     /* ── Close bar ── */
     qCloseBtn.addEventListener('click', () => {
         qBar.classList.remove('open');
+        qBar.classList.remove('q-collapsed');   // reset trạng thái thu gọn khi tắt hẳn
+        qCollapseBtn.textContent = '▲';
+        qCollapseBtn.classList.remove('collapsed-icon');
         sideBtn.classList.remove('ql-active');
+    });
+
+    /* ── Thu gọn / Mở rộng câu hỏi (giữ nguyên câu đang hiển thị) ── */
+    qCollapseBtn.addEventListener('click', () => {
+        const isCollapsed = qBar.classList.toggle('q-collapsed');
+        if (isCollapsed) {
+            qCollapseBtn.textContent = '▼';
+            qCollapseBtn.title = 'Hiện lại câu hỏi';
+            qCollapseBtn.classList.add('collapsed-icon');
+        } else {
+            qCollapseBtn.textContent = '▲';
+            qCollapseBtn.title = 'Thu gọn câu hỏi';
+            qCollapseBtn.classList.remove('collapsed-icon');
+        }
     });
 
     /* ── Keyboard: ArrowRight / ArrowLeft when q-bar is open ── */
